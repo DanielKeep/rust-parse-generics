@@ -188,33 +188,32 @@ fn try_parse_generics(
         ltimes.push(ltime_tt(ltime.lifetime));
         ltimes.push(tok_tt(Token::Comma));
 
-        if ltime.bounds.len() > 0 {
-            if constr.len() != 0 {
-                constr.push(tok_tt(Token::Comma));
-            }
-            ltime_def_to_tts(&ltime, &mut constr);
-        }
+        ltime_def_to_tts(&ltime, &mut constr);
+        constr.push(tok_tt(Token::Comma));
     }
 
     for param in gen.ty_params.move_iter() {
         params.push(ident_tt(param.ident));
         params.push(tok_tt(token::Comma));
 
+        constr.push(ident_tt(param.ident));
         if param.bounds.len() > 0 {
-            if constr.len() != 0 {
-                constr.push(tok_tt(Token::Comma));
-            }
-            constr.push(ident_tt(param.ident));
             constr.push(tok_tt(Token::Colon));
             let mut need_plus = false;
             for bound in param.bounds.move_iter() {
                 try!(ty_param_bound_to_tts(&bound, &mut constr, &mut need_plus));
             }
         }
+        constr.push(tok_tt(Token::Comma));
     }
 
     let mut ex_tts = vec![
         delim_tt!({
+            ident_str_tt("constr"),
+            tok_tt(Token::Colon),
+            delim_tt!([] <- constr),
+            tok_tt(Token::Comma),
+
             ident_str_tt("ltimes"),
             tok_tt(Token::Colon),
             delim_tt!([] <- ltimes),
@@ -223,11 +222,6 @@ fn try_parse_generics(
             ident_str_tt("params"),
             tok_tt(Token::Colon),
             delim_tt!([] <- params),
-            tok_tt(Token::Comma),
-
-            ident_str_tt("constr"),
-            tok_tt(Token::Colon),
-            delim_tt!([] <- constr),
         }),
         tok_tt(Token::Comma),
     ];

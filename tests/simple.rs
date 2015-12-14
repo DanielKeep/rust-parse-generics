@@ -11,88 +11,157 @@ macro_rules! assert_eq_str {
 fn test_simple() {
     assert_eq_str!(
         parse_generics!(then stringify!(),),
-        "{ ltimes : [  ] , params : [  ] , constr : [  ] } ,"
+        "{ \
+            constr : [  ] , \
+            ltimes : [  ] , \
+            params : [  ] \
+        } ,"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <>),
-        "{ ltimes : [  ] , params : [  ] , constr : [  ] } ,"
+        "{ \
+            constr : [  ] , \
+            ltimes : [  ] , \
+            params : [  ] \
+        } ,"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), X),
-        "{ ltimes : [  ] , params : [  ] , constr : [  ] } , X"
+        "{ \
+            constr : [  ] , \
+            ltimes : [  ] , \
+            params : [  ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <> X),
-        "{ ltimes : [  ] , params : [  ] , constr : [  ] } , X"
+        "{ \
+            constr : [  ] , \
+            ltimes : [  ] , \
+            params : [  ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), 'a X),
-        "{ ltimes : [  ] , params : [  ] , constr : [  ] } , 'a X"
+        "{ \
+            constr : [  ] , \
+            ltimes : [  ] , \
+            params : [  ] \
+        } , 'a X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <'a> X),
-        "{ ltimes : [ 'a , ] , params : [  ] , constr : [  ] } , X"
+        "{ \
+            constr : [ 'a , ] , \
+            ltimes : [ 'a , ] , \
+            params : [  ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <'a, 'b> X),
-        "{ ltimes : [ 'a , 'b , ] , params : [  ] , constr : [  ] } , X"
+        "{ \
+            constr : [ 'a , 'b , ] , \
+            ltimes : [ 'a , 'b , ] , \
+            params : [  ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <T> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [  ] } , X"
+        "{ \
+            constr : [ T , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <T, U> X),
-        "{ ltimes : [  ] , params : [ T , U , ] , constr : [  ] } , X"
+        "{ \
+            constr : [ T , U , ] , \
+            ltimes : [  ] , \
+            params : [ T , U , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <'a, 'b: 'a> X),
-        "{ ltimes : [ 'a , 'b , ] , params : [  ] , constr : [ 'b : 'a ] } , X"
+        "{ \
+            constr : [ 'a , 'b : 'a , ] , \
+            ltimes : [ 'a , 'b , ] , \
+            params : [  ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <'a, 'b: 'a + 'c> X),
-        "{ ltimes : [ 'a , 'b , ] , params : [  ] , constr : [ 'b : 'a + 'c ] } , X"
+        "{ \
+            constr : [ 'a , 'b : 'a + 'c , ] , \
+            ltimes : [ 'a , 'b , ] , \
+            params : [  ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <T: Copy> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [ T : Copy ] } , X"
+        "{ \
+            constr : [ T : Copy , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <T: 'a> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [ T : 'a ] } , X"
+        "{ \
+            constr : [ T : 'a , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <T: 'a + Copy + Clone> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [ T : 'a + Copy + Clone ] } , X"
+        "{ \
+            constr : [ T : 'a + Copy + Clone , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(), <T: 'a + 'b + Copy + Clone> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [ T : 'a + 'b + Copy + Clone ] } , X"
+        "{ \
+            constr : [ T : 'a + 'b + Copy + Clone , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(),
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32)> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [ T : 'a + 'b + Copy + Clone + for < 'c , 'd : 'e > Fn(&'c i32) ] } , X"
+        "{ \
+            constr : [ T : 'a + 'b + Copy + Clone \
+                + for < 'c , 'd : 'e > Fn(&'c i32) , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 
     assert_eq_str!(
         parse_generics!(then stringify!(),
             <T: for<> Copy> X),
-        "{ ltimes : [  ] , params : [ T , ] , constr : [ T : Copy ] } , X"
+        "{ \
+            constr : [ T : Copy , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
     );
 }
