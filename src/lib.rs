@@ -63,7 +63,7 @@ impl MacResult for MacMac {
     fn make_items(self: Box<Self>) -> Option<SmallVector<P<ast::Item>>> {
         let sp = self.mac.span;
         Some(SmallVector::one(P(ast::Item {
-            ident: str_to_ident("callback"),
+            ident: token::special_idents::invalid,
             attrs: vec![],
             id: ast::DUMMY_NODE_ID,
             node: ast::ItemMac(self.mac),
@@ -76,7 +76,7 @@ impl MacResult for MacMac {
         let sp = self.mac.span;
         Some(SmallVector::one(P(ast::ImplItem {
             id: ast::DUMMY_NODE_ID,
-            ident: str_to_ident("callback"),
+            ident: token::special_idents::invalid,
             vis: ast::Visibility::Inherited,
             attrs: vec![],
             node: ast::ImplItemKind::Macro(self.mac),
@@ -142,7 +142,7 @@ fn try_parse_generics(
     let tts = try!(skip_ident_str("then", tts));
     let (callback_sp, callback, tts) = try!(eat_ident(tts));
     let tts = try!(skip_token(Token::Not, tts));
-    let (_args, tts) = try!(eat_delim(tts));
+    let (callback_args, tts) = try!(eat_delim(tts));
     let tts = try!(skip_token(Token::Comma, tts));
 
     let mut parser = cx.new_parser_from_tts(tts);
@@ -207,24 +207,24 @@ fn try_parse_generics(
         constr.push(tok_tt(Token::Comma));
     }
 
-    let mut ex_tts = vec![
-        delim_tt!({
-            ident_str_tt("constr"),
-            tok_tt(Token::Colon),
-            delim_tt!([] <- constr),
-            tok_tt(Token::Comma),
+    let mut ex_tts = callback_args.tts.clone();
 
-            ident_str_tt("ltimes"),
-            tok_tt(Token::Colon),
-            delim_tt!([] <- ltimes),
-            tok_tt(Token::Comma),
-
-            ident_str_tt("params"),
-            tok_tt(Token::Colon),
-            delim_tt!([] <- params),
-        }),
+    ex_tts.push(delim_tt!({
+        ident_str_tt("constr"),
+        tok_tt(Token::Colon),
+        delim_tt!([] <- constr),
         tok_tt(Token::Comma),
-    ];
+
+        ident_str_tt("ltimes"),
+        tok_tt(Token::Colon),
+        delim_tt!([] <- ltimes),
+        tok_tt(Token::Comma),
+
+        ident_str_tt("params"),
+        tok_tt(Token::Colon),
+        delim_tt!([] <- params),
+    }));
+    ex_tts.push(tok_tt(Token::Comma));
 
     {
         let mut tail = tail;

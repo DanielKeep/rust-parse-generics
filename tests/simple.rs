@@ -19,6 +19,15 @@ fn test_simple() {
     );
 
     assert_eq_str!(
+        parse_generics!(then stringify!(W),),
+        "W { \
+            constr : [  ] , \
+            ltimes : [  ] , \
+            params : [  ] \
+        } ,"
+    );
+
+    assert_eq_str!(
         parse_generics!(then stringify!(), <>),
         "{ \
             constr : [  ] , \
