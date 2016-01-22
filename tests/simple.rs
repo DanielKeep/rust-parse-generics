@@ -127,6 +127,24 @@ fn test_simple() {
     );
 
     assert_eq_str!(
+        parse_generics!(then stringify!(), <T: std::marker::Copy> X),
+        "{ \
+            constr : [ T : std :: marker :: Copy , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
+    );
+
+    assert_eq_str!(
+        parse_generics!(then stringify!(), <T: ::std::marker::Copy> X),
+        "{ \
+            constr : [ T : :: std :: marker :: Copy , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
+    );
+
+    assert_eq_str!(
         parse_generics!(then stringify!(), <T: 'a> X),
         "{ \
             constr : [ T : 'a , ] , \
@@ -155,10 +173,43 @@ fn test_simple() {
 
     assert_eq_str!(
         parse_generics!(then stringify!(),
+            <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn()> X),
+        "{ \
+            constr : [ T : 'a + 'b + Copy + Clone \
+                + for < 'c , 'd : 'e > Fn ( ) , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
+    );
+
+    assert_eq_str!(
+        parse_generics!(then stringify!(),
+            <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn() -> &'c i32> X),
+        "{ \
+            constr : [ T : 'a + 'b + Copy + Clone \
+                + for < 'c , 'd : 'e > Fn ( ) -> &'c i32 , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
+    );
+
+    assert_eq_str!(
+        parse_generics!(then stringify!(),
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32)> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
                 + for < 'c , 'd : 'e > Fn ( &'c i32 , ) , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
+    );
+
+    assert_eq_str!(
+        parse_generics!(then stringify!(),
+            <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32) -> &'d ()> X),
+        "{ \
+            constr : [ T : 'a + 'b + Copy + Clone \
+                + for < 'c , 'd : 'e > Fn ( &'c i32 , ) -> &'d () , ] , \
             ltimes : [  ] , \
             params : [ T , ] \
         } , X"
