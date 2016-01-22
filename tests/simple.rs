@@ -224,4 +224,14 @@ fn test_simple() {
             params : [ T , ] \
         } , X"
     );
+
+    assert_eq_str!(
+        parse_generics!(then stringify!(),
+            <T: ::std::convert::Into<String>> X),
+        "{ \
+            constr : [ T : :: std :: convert :: Into < String , > , ] , \
+            ltimes : [  ] , \
+            params : [ T , ] \
+        } , X"
+    );
 }

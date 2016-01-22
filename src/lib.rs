@@ -402,27 +402,40 @@ fn path_to_tts(path: &ast::Path, tts: &mut Vec<TokenTree>) {
         tts.push(ident_tt(seg.identifier));
         match seg.parameters {
             PP::AngleBracketed(ref data) if !seg.parameters.is_empty() => {
-                // tts.push(tok_tt(Token::Lt));
-                panic!("NYI: {:?}", data);
-                // tts.push(tok_tt(Token::Gt));
+                tts.push(tok_tt(Token::Lt));
+                for lifetime in &data.lifetimes {
+                    tts.push(ltime_tt(*lifetime));
+                    tts.push(tok_tt(Token::Comma));
+                }
+                for ty in &data.types {
+                    tts.push(nt_ty_tt(ty.clone()));
+                    tts.push(tok_tt(Token::Comma));
+                }
+                for binding in &data.bindings {
+                    tts.push(ident_tt(binding.ident));
+                    tts.push(tok_tt(Token::Eq));
+                    tts.push(nt_ty_tt(binding.ty.clone()));
+                    tts.push(tok_tt(Token::Comma));
+                }
+                tts.push(tok_tt(Token::Gt));
             },
             PP::AngleBracketed(_) => (),
             PP::Parenthesized(ref data) => {
                 tts.push(tok_tt(Token::OpenDelim(DelimToken::Paren)));
                 for input in &data.inputs {
-                    tts.push(tok_tt(Token::Interpolated(
-                        token::Nonterminal::NtTy(
-                            input.clone()))));
+                    tts.push(nt_ty_tt(input.clone()));
                     tts.push(tok_tt(Token::Comma));
                 }
                 tts.push(tok_tt(Token::CloseDelim(DelimToken::Paren)));
                 if let Some(ref output) = data.output {
                     tts.push(tok_tt(Token::RArrow));
-                    tts.push(tok_tt(Token::Interpolated(
-                        token::Nonterminal::NtTy(
-                            output.clone()))));
+                    tts.push(nt_ty_tt(output.clone()));
                 }
             },
         }
     }
+}
+
+fn nt_ty_tt(ty: P<ast::Ty>) -> TokenTree {
+    tok_tt(Token::Interpolated(token::Nonterminal::NtTy(ty)))
 }
