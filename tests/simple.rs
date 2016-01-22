@@ -158,7 +158,7 @@ fn test_simple() {
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32)> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
-                + for < 'c , 'd : 'e > Fn(&'c i32) , ] , \
+                + for < 'c , 'd : 'e > Fn ( &'c i32 , ) , ] , \
             ltimes : [  ] , \
             params : [ T , ] \
         } , X"

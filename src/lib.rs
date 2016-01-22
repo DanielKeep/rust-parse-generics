@@ -10,7 +10,7 @@ use syntax::ast::{self, TokenTree};
 use syntax::codemap;
 use syntax::ext::base::{ExtCtxt, MacResult, DummyResult};
 use syntax::parse::token::str_to_ident;
-use syntax::parse::token::{self, Token};
+use syntax::parse::token::{self, DelimToken, Token};
 use syntax::ptr::P;
 use syntax::util::small_vector::SmallVector;
 
@@ -163,7 +163,7 @@ fn try_parse_generics(
     macro_rules! delim_tt {
         ({$($e:expr),* $(,)*}) => {
             TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
-                delim: token::DelimToken::Brace,
+                delim: DelimToken::Brace,
                 open_span: DUM_SP,
                 tts: vec![$($e),*],
                 close_span: DUM_SP,
@@ -172,7 +172,7 @@ fn try_parse_generics(
 
         ([] <- $e:expr) => {
             TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
-                delim: token::DelimToken::Bracket,
+                delim: DelimToken::Bracket,
                 open_span: DUM_SP,
                 tts: $e,
                 close_span: DUM_SP,
@@ -380,9 +380,7 @@ fn ty_param_bound_to_tts(
                 }
                 tts.push(tok_tt(Token::Gt));
             }
-            tts.push(tok_tt(Token::Interpolated(
-                token::Nonterminal::NtPath(
-                    Box::new(ptr.trait_ref.path.clone())))));
+            path_to_tts(&ptr.trait_ref.path, tts);
         },
         RegionTyParamBound(lt) => {
             emit_plus!();
@@ -390,4 +388,41 @@ fn ty_param_bound_to_tts(
         },
     }
     Ok(())
+}
+
+fn path_to_tts(path: &ast::Path, tts: &mut Vec<TokenTree>) {
+    use syntax::ast::PathParameters as PP;
+    if path.global {
+        tts.push(tok_tt(Token::ModSep));
+    }
+    for (i, seg) in (&path.segments).into_iter().enumerate() {
+        if i > 0 {
+            tts.push(tok_tt(Token::ModSep));
+        }
+        tts.push(ident_tt(seg.identifier));
+        match seg.parameters {
+            PP::AngleBracketed(ref data) if !seg.parameters.is_empty() => {
+                // tts.push(tok_tt(Token::Lt));
+                panic!("NYI: {:?}", data);
+                // tts.push(tok_tt(Token::Gt));
+            },
+            PP::AngleBracketed(_) => (),
+            PP::Parenthesized(ref data) => {
+                tts.push(tok_tt(Token::OpenDelim(DelimToken::Paren)));
+                for input in &data.inputs {
+                    tts.push(tok_tt(Token::Interpolated(
+                        token::Nonterminal::NtTy(
+                            input.clone()))));
+                    tts.push(tok_tt(Token::Comma));
+                }
+                tts.push(tok_tt(Token::CloseDelim(DelimToken::Paren)));
+                if let Some(ref output) = data.output {
+                    tts.push(tok_tt(Token::RArrow));
+                    tts.push(tok_tt(Token::Interpolated(
+                        token::Nonterminal::NtTy(
+                            output.clone()))));
+                }
+            },
+        }
+    }
 }
