@@ -62,3 +62,23 @@ fn to_string<T: Display>(v: T) -> String {
 fn test_wrap_fn() {
     assert_eq!(&*wrap_to_string(42i32), "wrap:42");
 }
+
+trait Dummy<'a, T: ?Sized>: Sized {
+    fn id(self) -> Self { self }
+}
+
+impl<'a> Dummy<'a, str> for &'a str {}
+
+fn id<'a, T: ?Sized, U: ::Dummy<'a, T>>(v: U) -> U { v.id() }
+
+wrap_fn! {
+    as wrap_id,
+    fn id<'a, T: ?Sized, U: ::Dummy<'a, T>>(v: U) -> U;
+    pre {}
+    post(result) { result }
+}
+
+#[test]
+fn test_wrap_fn_id() {
+    assert_eq!(wrap_id("hi!"), "hi!");
+}
