@@ -138,3 +138,29 @@ fn test_iter_e() {
     assert_eq!(it.next(), Some(&"times in our lives"));
     assert_eq!(it.next(), None);
 }
+
+custom_derive! {
+    #[derive(Iterator)]
+    struct IterF<I: Iterator>(I);
+}
+
+#[test]
+fn test_iter_f() {
+    let mut it = IterF(once("you pop"));
+    for e in it {
+        assert!(e != "stop");
+    }
+}
+
+custom_derive! {
+    #[derive(Iterator)]
+    struct IterG<I>(I) where I: Iterator;
+}
+
+#[test]
+fn test_iter_g() {
+    let mut it = IterG(once("you pop"));
+    for e in it {
+        assert!(e != "stop");
+    }
+}
