@@ -3,6 +3,7 @@
 #[macro_use] extern crate custom_derive;
 
 use std::iter::once;
+use std::marker::PhantomData;
 
 macro_rules! Iterator {
     (
@@ -17,17 +18,49 @@ macro_rules! Iterator {
     (
         @with_generics
         () struct $name:ident,
+        $generics:tt,
+        ($($body:tt)*)
+        $($tail:tt)*
+    ) => {
+        parse_where! {
+            then Iterator!(@with_where () struct $name, $generics,),
+            $($tail)* ($($body)*)
+        }
+    };
+
+    (
+        @with_where
+        () struct $name:ident,
+        $generics:tt,
+        $preds:tt,
+        ; ($(pub)* $fty:ty)
+    ) => {
+        Iterator! {
+            @with_where
+            () struct $name,
+            $generics,
+            $preds,
+            ; ($fty,)
+        }
+    };
+
+    (
+        @with_where
+        () struct $name:ident,
         {
             constr: [$($constr:tt)*],
             ltimes: [$($ltimes:tt)*],
             params: [$($params:tt)*]
         },
-        ($(pub)* $fty:ty);
+        {
+            preds: [$($preds:tt)*]
+        },
+        ; ($(pub)* $fty:ty, $(PhantomData<$_phtys:ty>),* $(,)*)
     ) => {
         Iterator! {
             @as_items
             impl<$($constr)*> Iterator for $name<$($ltimes)* $($params)*>
-            where $fty: Iterator {
+            where $fty: Iterator, $($preds)* {
                 type Item = <$fty as Iterator>::Item;
                 fn next(&mut self) -> Option<Self::Item> {
                     Iterator::next(&mut self.0)
@@ -75,5 +108,33 @@ custom_derive! {
 fn test_iter_c() {
     let mut it = IterC::<'static, str>(Box::new(once("upon a time")));
     assert_eq!(it.next(), Some("upon a time"));
+    assert_eq!(it.next(), None);
+}
+
+custom_derive! {
+    #[derive(Iterator)]
+    struct IterD<'a, T: ?Sized + 'a>(Box<Iterator<Item=&'a T> + 'a>)
+    where T: Copy;
+}
+
+#[test]
+fn test_iter_d() {
+    const S: &'static &'static str = &"times in our lives";
+    let mut it = IterD(Box::new(once(S)));
+    assert_eq!(it.next(), Some(&"times in our lives"));
+    assert_eq!(it.next(), None);
+}
+
+custom_derive! {
+    #[derive(Iterator)]
+    struct IterE<T>(Box<Iterator<Item=T>>, PhantomData<T>)
+    where T: Copy + Clone;
+}
+
+#[test]
+fn test_iter_e() {
+    const S: &'static &'static str = &"times in our lives";
+    let mut it = IterE(Box::new(once(S)), PhantomData);
+    assert_eq!(it.next(), Some(&"times in our lives"));
     assert_eq!(it.next(), None);
 }
