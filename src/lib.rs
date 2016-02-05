@@ -8,11 +8,32 @@ use std::convert::Into;
 use std::rc::Rc;
 use syntax::ast::{self, TokenTree};
 use syntax::codemap;
+use syntax::errors::DiagnosticBuilder;
 use syntax::ext::base::{ExtCtxt, MacResult, DummyResult};
 use syntax::parse::token::str_to_ident;
 use syntax::parse::token::{self, DelimToken, Token};
 use syntax::ptr::P;
 use syntax::util::small_vector::SmallVector;
+
+macro_rules! delim_tt {
+    ({$($e:expr),* $(,)*}) => {
+        TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
+            delim: DelimToken::Brace,
+            open_span: DUM_SP,
+            tts: vec![$($e),*],
+            close_span: DUM_SP,
+        }))
+    };
+
+    ([] <- $e:expr) => {
+        TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
+            delim: DelimToken::Bracket,
+            open_span: DUM_SP,
+            tts: $e,
+            close_span: DUM_SP,
+        }))
+    };
+}
 
 macro_rules! throw {
     ($e:expr) => {
@@ -24,22 +45,38 @@ macro_rules! throw {
 #[doc(hidden)]
 pub fn plugin_registrar(reg: &mut rustc_plugin::Registry) {
     reg.register_macro("parse_generics", parse_generics);
+    reg.register_macro("parse_where", parse_where);
 }
 
-enum Error {
+enum Error<'a> {
+    Diagnostic(DiagnosticBuilder<'a>),
     SpanErr {
         sp: Option<codemap::Span>,
         msg: Cow<'static, str>,
     },
 }
 
-impl Error {
-    pub fn err<Str>(msg: Str) -> Error
+impl<'a> Error<'a> {
+    pub fn emit(self, cx: &mut ExtCtxt, fallback_sp: codemap::Span) {
+        use self::Error::*;
+        match self {
+            Diagnostic(mut diag) => diag.emit(),
+            SpanErr { sp, msg } => {
+                cx.span_err(sp.unwrap_or(fallback_sp), &*msg);
+            },
+        }
+    }
+
+    pub fn diag(diag: DiagnosticBuilder<'a>) -> Error<'a> {
+        Error::Diagnostic(diag)
+    }
+
+    pub fn err<Str>(msg: Str) -> Error<'static>
     where Str: Into<Cow<'static, str>> {
         Error::SpanErr { sp: None, msg: msg.into() }
     }
 
-    pub fn span_err<Str>(sp: codemap::Span, msg: Str) -> Error
+    pub fn span_err<Str>(sp: codemap::Span, msg: Str) -> Error<'static>
     where Str: Into<Cow<'static, str>> {
         Error::SpanErr { sp: Some(sp), msg: msg.into() }
     }
@@ -123,22 +160,31 @@ fn parse_generics(
     match try_parse_generics(cx, sp, tts) {
         Ok(res) => res,
         Err(err) => {
-            use Error::*;
-            match err {
-                SpanErr { sp: err_sp, msg } => {
-                    cx.span_err(err_sp.unwrap_or(sp), &*msg);
-                },
-            }
+            err.emit(cx, sp);
             DummyResult::any(sp)
         }
     }
 }
 
-fn try_parse_generics(
+fn parse_where(
     cx: &mut ExtCtxt,
+    sp: codemap::Span,
+    tts: &[TokenTree]
+) -> Box<MacResult+'static> {
+    match try_parse_where(cx, sp, tts) {
+        Ok(res) => res,
+        Err(err) => {
+            err.emit(cx, sp);
+            DummyResult::any(sp)
+        }
+    }
+}
+
+fn try_parse_generics<'cx>(
+    cx: &mut ExtCtxt<'cx>,
     _sp: codemap::Span,
     tts: &[TokenTree]
-) -> Result<Box<MacResult + 'static>, Error> {
+) -> Result<Box<MacResult + 'static>, Error<'cx>> {
     let tts = try!(skip_ident_str("then", tts));
     let (callback_sp, callback, tts) = try!(eat_ident(tts));
     let tts = try!(skip_token(Token::Not, tts));
@@ -147,38 +193,12 @@ fn try_parse_generics(
 
     let mut parser = cx.new_parser_from_tts(tts);
     let gen = try!(parser.parse_generics()
-        .map_err(|_| Error::SpanErr {
-            sp: tts.get(0).map(|tt| tt.get_span()),
-            msg: "expected generic parameters".into(),
-        }));
+        .map_err(Error::diag));
 
     let tail = try!(parser.parse_all_token_trees()
-        .map_err(|_| Error::SpanErr {
-            sp: Some(parser.span),
-            msg: "somehow, could not parse tts".into(),
-        }));
+        .map_err(Error::diag));
 
     const DUM_SP: codemap::Span = codemap::DUMMY_SP;
-
-    macro_rules! delim_tt {
-        ({$($e:expr),* $(,)*}) => {
-            TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
-                delim: DelimToken::Brace,
-                open_span: DUM_SP,
-                tts: vec![$($e),*],
-                close_span: DUM_SP,
-            }))
-        };
-
-        ([] <- $e:expr) => {
-            TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
-                delim: DelimToken::Bracket,
-                open_span: DUM_SP,
-                tts: $e,
-                close_span: DUM_SP,
-            }))
-        };
-    }
 
     let mut ltimes = vec![];
     let mut params = vec![];
@@ -201,7 +221,7 @@ fn try_parse_generics(
             constr.push(tok_tt(Token::Colon));
             let mut need_plus = false;
             for bound in param.bounds.move_iter() {
-                try!(ty_param_bound_to_tts(&bound, &mut constr, &mut need_plus));
+                ty_param_bound_to_tts(&bound, &mut constr, &mut need_plus);
             }
         }
         constr.push(tok_tt(Token::Comma));
@@ -251,8 +271,69 @@ fn try_parse_generics(
     Ok(res as Box<MacResult + 'static>)
 }
 
+fn try_parse_where<'a>(
+    cx: &mut ExtCtxt<'a>,
+    _sp: codemap::Span,
+    tts: &[TokenTree]
+) -> Result<Box<MacResult + 'static>, Error<'a>> {
+    let tts = try!(skip_ident_str("then", tts));
+    let (callback_sp, callback, tts) = try!(eat_ident(tts));
+    let tts = try!(skip_token(Token::Not, tts));
+    let (callback_args, tts) = try!(eat_delim(tts));
+    let tts = try!(skip_token(Token::Comma, tts));
+
+    let mut parser = cx.new_parser_from_tts(tts);
+    let wh = try!(parser.parse_where_clause()
+        .map_err(Error::diag));
+
+    let tail = try!(parser.parse_all_token_trees()
+        .map_err(Error::diag));
+
+    const DUM_SP: codemap::Span = codemap::DUMMY_SP;
+
+    let mut preds = vec![];
+
+    for pred in &wh.predicates {
+        pred_to_tts(pred, &mut preds);
+        preds.push(tok_tt(Token::Comma));
+    }
+
+    let mut ex_tts = callback_args.tts.clone();
+
+    ex_tts.push(delim_tt!({
+        ident_str_tt("preds"),
+        tok_tt(Token::Colon),
+        delim_tt!([] <- preds),
+    }));
+    ex_tts.push(tok_tt(Token::Comma));
+
+    {
+        let mut tail = tail;
+        ex_tts.append(&mut tail);
+    }
+
+    let res = Box::new(MacMac {
+        mac: codemap::respan(callback_sp, ast::Mac_ {
+            path: ast::Path {
+                span: callback_sp,
+                global: false,
+                segments: vec![
+                    ast::PathSegment {
+                        identifier: *callback,
+                        parameters: ast::PathParameters::none(),
+                    }
+                ],
+            },
+            tts: ex_tts,
+            ctxt: ast::EMPTY_CTXT,
+        })
+    });
+
+    Ok(res as Box<MacResult + 'static>)
+}
+
 fn eat_delim(tts: &[TokenTree])
--> Result<(&ast::Delimited, &[TokenTree]), Error> {
+-> Result<(&ast::Delimited, &[TokenTree]), Error<'static>> {
     match tts.get(0) {
         Some(&TokenTree::Delimited(_, ref delim)) => Ok((&**delim, &tts[1..])),
         Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
@@ -262,7 +343,7 @@ fn eat_delim(tts: &[TokenTree])
 }
 
 fn eat_ident(tts: &[TokenTree])
--> Result<(codemap::Span, &ast::Ident, &[TokenTree]), Error> {
+-> Result<(codemap::Span, &ast::Ident, &[TokenTree]), Error<'static>> {
     match tts.get(0) {
         Some(&TokenTree::Token(sp, Token::Ident(ref ident, _))) => {
             Ok((sp, ident, &tts[1..]))
@@ -274,7 +355,7 @@ fn eat_ident(tts: &[TokenTree])
 }
 
 fn skip_ident_str<'a>(s: &str, tts: &'a [TokenTree])
--> Result<&'a [TokenTree], Error> {
+-> Result<&'a [TokenTree], Error<'static>> {
     match tts.get(0) {
         Some(&TokenTree::Token(_,
             Token::Ident(ast::Ident {
@@ -290,7 +371,7 @@ fn skip_ident_str<'a>(s: &str, tts: &'a [TokenTree])
     }
 }
 
-fn skip_token(tok: Token, tts: &[TokenTree]) -> Result<&[TokenTree], Error> {
+fn skip_token(tok: Token, tts: &[TokenTree]) -> Result<&[TokenTree], Error<'static>> {
     match tts.get(0) {
         Some(&TokenTree::Token(_, ref got_tok)) if *got_tok == tok
         => Ok(&tts[1..]),
@@ -344,7 +425,7 @@ fn ty_param_bound_to_tts(
     tpb: &ast::TyParamBound,
     tts: &mut Vec<TokenTree>,
     need_plus: &mut bool,
-) -> Result<(), Error> {
+) {
     use syntax::ast::TyParamBound::*;
 
     macro_rules! emit_plus {
@@ -387,7 +468,6 @@ fn ty_param_bound_to_tts(
             tts.push(ltime_tt(lt));
         },
     }
-    Ok(())
 }
 
 fn path_to_tts(path: &ast::Path, tts: &mut Vec<TokenTree>) {
@@ -438,4 +518,46 @@ fn path_to_tts(path: &ast::Path, tts: &mut Vec<TokenTree>) {
 
 fn nt_ty_tt(ty: P<ast::Ty>) -> TokenTree {
     tok_tt(Token::Interpolated(token::Nonterminal::NtTy(ty)))
+}
+
+fn pred_to_tts(pred: &ast::WherePredicate, tts: &mut Vec<TokenTree>) {
+    use syntax::ast::WherePredicate as WP;
+    match *pred {
+        WP::BoundPredicate(ref wbp) => {
+            if wbp.bound_lifetimes.len() > 0 {
+                tts.push(ident_str_tt("for"));
+                tts.push(tok_tt(Token::Lt));
+                let mut need_comma = false;
+                for ltd in &wbp.bound_lifetimes {
+                    if need_comma {
+                        tts.push(tok_tt(Token::Comma));
+                    }
+                    need_comma = true;
+                    ltime_def_to_tts(ltd, tts);
+                }
+                tts.push(tok_tt(Token::Gt));
+            }
+            tts.push(nt_ty_tt(wbp.bounded_ty.clone()));
+            tts.push(tok_tt(Token::Colon));
+            let mut need_plus = false;
+            for tpb in &wbp.bounds {
+                ty_param_bound_to_tts(tpb, tts, &mut need_plus);
+            }
+        },
+        WP::RegionPredicate(ref rp) => {
+            tts.push(ltime_tt(rp.lifetime));
+            tts.push(tok_tt(Token::Colon));
+            let mut need_plus = false;
+            for bound in &rp.bounds {
+                if need_plus {
+                    tts.push(tok_tt(Token::BinOp(token::BinOpToken::Plus)));
+                }
+                need_plus = true;
+                tts.push(ltime_tt(*bound));
+            }
+        },
+        WP::EqPredicate(_) => {
+            panic!("equality predicates should not exist");
+        },
+    }
 }

@@ -235,3 +235,63 @@ fn test_simple() {
         } , X"
     );
 }
+
+#[test]
+fn test_simple_where() {
+    assert_eq_str!(
+        parse_where!(then stringify!(),),
+        "{ preds : [  ] } ,"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(), X),
+        "{ preds : [  ] } , X"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(), {} X),
+        "{ preds : [  ] } , {  } X"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(), where T: Copy {X}),
+        "{ preds : [ T : Copy , ] } , { X }"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(), where T: Copy, {X}),
+        "{ preds : [ T : Copy , ] } , { X }"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(), where T: Copy; {X}),
+        "{ preds : [ T : Copy , ] } , ; { X }"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(), where for<'a> &'a str: Into<T> {X}),
+        "{ preds : [ for < 'a > &'a str : Into < T , > , ] } , { X }"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(),
+            where for<'a: 'b, 'b> &'a str: Into<T+'b> {X}),
+        "{ \
+            preds : [ \
+                for < 'a : 'b , 'b > &'a str : Into < T+ 'b , > , \
+            ] \
+        } , { X }"
+    );
+
+    assert_eq_str!(
+        parse_where!(then stringify!(),
+            where &'a str: Into<T+'b>, 'a: 'b, 'b: 'c + 'd {X}),
+        "{ \
+            preds : [ \
+                &'a str : Into < T+ 'b , > , \
+                'a : 'b , \
+                'b : 'c + 'd , \
+            ] \
+        } , { X }"
+    );
+}
