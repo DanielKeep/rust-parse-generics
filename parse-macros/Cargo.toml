@@ -5,3 +5,5 @@ authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
 [dependencies]
 parse-generics-poc = { path="../" }
+
+custom_derive = "0.1.4"
