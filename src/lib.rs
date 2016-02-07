@@ -200,11 +200,15 @@ fn try_parse_generics<'cx>(
 
     const DUM_SP: codemap::Span = codemap::DUMMY_SP;
 
-    let mut ltimes = vec![];
-    let mut params = vec![];
     let mut constr = vec![];
+    let mut params = vec![];
+    let mut ltimes = vec![];
+    let mut tnames = vec![];
 
     for ltime in gen.lifetimes {
+        params.push(ltime_tt(ltime.lifetime));
+        params.push(tok_tt(Token::Comma));
+
         ltimes.push(ltime_tt(ltime.lifetime));
         ltimes.push(tok_tt(Token::Comma));
 
@@ -215,6 +219,9 @@ fn try_parse_generics<'cx>(
     for param in gen.ty_params.move_iter() {
         params.push(ident_tt(param.ident));
         params.push(tok_tt(token::Comma));
+
+        tnames.push(ident_tt(param.ident));
+        tnames.push(tok_tt(token::Comma));
 
         constr.push(ident_tt(param.ident));
         if param.bounds.len() > 0 {
@@ -235,14 +242,20 @@ fn try_parse_generics<'cx>(
         delim_tt!([] <- constr),
         tok_tt(Token::Comma),
 
+        ident_str_tt("params"),
+        tok_tt(Token::Colon),
+        delim_tt!([] <- params),
+        tok_tt(Token::Comma),
+
         ident_str_tt("ltimes"),
         tok_tt(Token::Colon),
         delim_tt!([] <- ltimes),
         tok_tt(Token::Comma),
 
-        ident_str_tt("params"),
+        ident_str_tt("tnames"),
         tok_tt(Token::Colon),
-        delim_tt!([] <- params),
+        delim_tt!([] <- tnames),
+        tok_tt(Token::Comma),
     }));
     ex_tts.push(tok_tt(Token::Comma));
 
@@ -304,6 +317,7 @@ fn try_parse_where<'a>(
         ident_str_tt("preds"),
         tok_tt(Token::Colon),
         delim_tt!([] <- preds),
+        tok_tt(Token::Comma),
     }));
     ex_tts.push(tok_tt(Token::Comma));
 

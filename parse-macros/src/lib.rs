@@ -132,7 +132,6 @@ macro_rules! parse_enum {
                 where: $preds,
                 variants: $variants,
                 num_variants: $ord,
-                ...
             }
         }
     };
@@ -177,7 +176,6 @@ macro_rules! parse_enum {
                         name: $vname,
                         fields: (),
                         num_fields: 0,
-                        ...
                     },
                 ],
                 [],
@@ -252,7 +250,6 @@ macro_rules! parse_enum {
                         name: $vname,
                         fields: $fields,
                         num_fields: $ford,
-                        ...
                     },
                 ],
                 [],
@@ -367,7 +364,6 @@ macro_rules! parse_enum {
                         name: $vname,
                         fields: $fields,
                         num_fields: $ford,
-                        ...
                     },
                 ],
                 [],
@@ -532,7 +528,6 @@ macro_rules! parse_struct {
                 kind: unitary,
                 fields: [],
                 num_fields: 0,
-                ...
             }
         }
     };
@@ -599,7 +594,6 @@ macro_rules! parse_struct {
                 kind: tuple,
                 fields: $fields,
                 num_fields: $ord,
-                ...
             }
         }
     };
@@ -708,7 +702,6 @@ macro_rules! parse_struct {
                 kind: record,
                 fields: $fields,
                 num_fields: $ord,
-                ...
             }
         }
     };

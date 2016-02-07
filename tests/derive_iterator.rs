@@ -49,17 +49,17 @@ macro_rules! Iterator {
         () struct $name:ident,
         {
             constr: [$($constr:tt)*],
-            ltimes: [$($ltimes:tt)*],
-            params: [$($params:tt)*]
+            params: [$($params:tt)*],
+            $($_generics_tail:tt)*
         },
         {
-            preds: [$($preds:tt)*]
+            preds: [$($preds:tt)*],
         },
         ; ($(pub)* $fty:ty, $(PhantomData<$_phtys:ty>),* $(,)*)
     ) => {
         Iterator! {
             @as_items
-            impl<$($constr)*> Iterator for $name<$($ltimes)* $($params)*>
+            impl<$($constr)*> Iterator for $name<$($params)*>
             where $fty: Iterator, $($preds)* {
                 type Item = <$fty as Iterator>::Item;
                 fn next(&mut self) -> Option<Self::Item> {

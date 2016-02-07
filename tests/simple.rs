@@ -13,8 +13,9 @@ fn test_simple() {
         parse_generics!(then stringify!(),),
         "{ \
             constr : [  ] , \
+            params : [  ] , \
             ltimes : [  ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } ,"
     );
 
@@ -22,8 +23,9 @@ fn test_simple() {
         parse_generics!(then stringify!(W),),
         "W { \
             constr : [  ] , \
+            params : [  ] , \
             ltimes : [  ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } ,"
     );
 
@@ -31,8 +33,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <>),
         "{ \
             constr : [  ] , \
+            params : [  ] , \
             ltimes : [  ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } ,"
     );
 
@@ -40,8 +43,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), X),
         "{ \
             constr : [  ] , \
+            params : [  ] , \
             ltimes : [  ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , X"
     );
 
@@ -49,8 +53,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <> X),
         "{ \
             constr : [  ] , \
+            params : [  ] , \
             ltimes : [  ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , X"
     );
 
@@ -58,8 +63,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), 'a X),
         "{ \
             constr : [  ] , \
+            params : [  ] , \
             ltimes : [  ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , 'a X"
     );
 
@@ -67,8 +73,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <'a> X),
         "{ \
             constr : [ 'a , ] , \
+            params : [ 'a , ] , \
             ltimes : [ 'a , ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , X"
     );
 
@@ -76,8 +83,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <'a, 'b> X),
         "{ \
             constr : [ 'a , 'b , ] , \
+            params : [ 'a , 'b , ] , \
             ltimes : [ 'a , 'b , ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , X"
     );
 
@@ -85,8 +93,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T> X),
         "{ \
             constr : [ T , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -94,8 +103,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T, U> X),
         "{ \
             constr : [ T , U , ] , \
+            params : [ T , U , ] , \
             ltimes : [  ] , \
-            params : [ T , U , ] \
+            tnames : [ T , U , ] , \
         } , X"
     );
 
@@ -103,8 +113,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <'a, 'b: 'a> X),
         "{ \
             constr : [ 'a , 'b : 'a , ] , \
+            params : [ 'a , 'b , ] , \
             ltimes : [ 'a , 'b , ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , X"
     );
 
@@ -112,8 +123,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <'a, 'b: 'a + 'c> X),
         "{ \
             constr : [ 'a , 'b : 'a + 'c , ] , \
+            params : [ 'a , 'b , ] , \
             ltimes : [ 'a , 'b , ] , \
-            params : [  ] \
+            tnames : [  ] , \
         } , X"
     );
 
@@ -121,8 +133,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T: Copy> X),
         "{ \
             constr : [ T : Copy , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -130,8 +143,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T: std::marker::Copy> X),
         "{ \
             constr : [ T : std :: marker :: Copy , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -139,8 +153,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T: ::std::marker::Copy> X),
         "{ \
             constr : [ T : :: std :: marker :: Copy , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -148,8 +163,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T: 'a> X),
         "{ \
             constr : [ T : 'a , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -157,8 +173,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T: 'a + Copy + Clone> X),
         "{ \
             constr : [ T : 'a + Copy + Clone , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -166,8 +183,9 @@ fn test_simple() {
         parse_generics!(then stringify!(), <T: 'a + 'b + Copy + Clone> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -177,8 +195,9 @@ fn test_simple() {
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
                 + for < 'c , 'd : 'e > Fn ( ) , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -188,8 +207,9 @@ fn test_simple() {
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
                 + for < 'c , 'd : 'e > Fn ( ) -> &'c i32 , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -199,8 +219,9 @@ fn test_simple() {
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
                 + for < 'c , 'd : 'e > Fn ( &'c i32 , ) , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -210,8 +231,21 @@ fn test_simple() {
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
                 + for < 'c , 'd : 'e > Fn ( &'c i32 , ) -> &'d () , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
+        } , X"
+    );
+
+    assert_eq_str!(
+        parse_generics!(then stringify!(),
+            <'a, 'b, 'd, T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32) -> &'d ()> X),
+        "{ \
+            constr : [ 'a , 'b , 'd , T : 'a + 'b + Copy + Clone \
+                + for < 'c , 'd : 'e > Fn ( &'c i32 , ) -> &'d () , ] , \
+            params : [ 'a , 'b , 'd , T , ] , \
+            ltimes : [ 'a , 'b , 'd , ] , \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -220,8 +254,9 @@ fn test_simple() {
             <T: for<> Copy> X),
         "{ \
             constr : [ T : Copy , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 
@@ -230,8 +265,9 @@ fn test_simple() {
             <T: ::std::convert::Into<String>> X),
         "{ \
             constr : [ T : :: std :: convert :: Into < String , > , ] , \
+            params : [ T , ] , \
             ltimes : [  ] , \
-            params : [ T , ] \
+            tnames : [ T , ] , \
         } , X"
     );
 }
@@ -240,37 +276,37 @@ fn test_simple() {
 fn test_simple_where() {
     assert_eq_str!(
         parse_where!(then stringify!(),),
-        "{ preds : [  ] } ,"
+        "{ preds : [  ] , } ,"
     );
 
     assert_eq_str!(
         parse_where!(then stringify!(), X),
-        "{ preds : [  ] } , X"
+        "{ preds : [  ] , } , X"
     );
 
     assert_eq_str!(
         parse_where!(then stringify!(), {} X),
-        "{ preds : [  ] } , {  } X"
+        "{ preds : [  ] , } , {  } X"
     );
 
     assert_eq_str!(
         parse_where!(then stringify!(), where T: Copy {X}),
-        "{ preds : [ T : Copy , ] } , { X }"
+        "{ preds : [ T : Copy , ] , } , { X }"
     );
 
     assert_eq_str!(
         parse_where!(then stringify!(), where T: Copy, {X}),
-        "{ preds : [ T : Copy , ] } , { X }"
+        "{ preds : [ T : Copy , ] , } , { X }"
     );
 
     assert_eq_str!(
         parse_where!(then stringify!(), where T: Copy; {X}),
-        "{ preds : [ T : Copy , ] } , ; { X }"
+        "{ preds : [ T : Copy , ] , } , ; { X }"
     );
 
     assert_eq_str!(
         parse_where!(then stringify!(), where for<'a> &'a str: Into<T> {X}),
-        "{ preds : [ for < 'a > &'a str : Into < T , > , ] } , { X }"
+        "{ preds : [ for < 'a > &'a str : Into < T , > , ] , } , { X }"
     );
 
     assert_eq_str!(
@@ -279,7 +315,7 @@ fn test_simple_where() {
         "{ \
             preds : [ \
                 for < 'a : 'b , 'b > &'a str : Into < T+ 'b , > , \
-            ] \
+            ] , \
         } , { X }"
     );
 
@@ -291,7 +327,7 @@ fn test_simple_where() {
                 &'a str : Into < T+ 'b , > , \
                 'a : 'b , \
                 'b : 'c + 'd , \
-            ] \
+            ] , \
         } , { X }"
     );
 }

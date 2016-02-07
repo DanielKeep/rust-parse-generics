@@ -48,19 +48,18 @@ macro_rules! CloneCopy {
         @expand ($_kind:tt $name:ident),
         {
             constr: [$($constr:tt)*],
-            ltimes: [$($ltimes:tt)*],
-            params: []
-            $($_more_generics:tt)*
+            params: [$($params:tt)*],
+            ltimes: $_ltimes:tt,
+            tnames: [],
         },
         {
-            preds: []
-            $($_more_preds:tt)*
+            preds: [],
         },
         $($_tail:tt)*
     ) => {
         CloneCopy! {
             @as_item
-            impl<$($constr)*> Clone for $name<$($ltimes)*> {
+            impl<$($constr)*> Clone for $name<$($params)*> {
                 fn clone(&self) -> Self {
                     *self
                 }
@@ -72,9 +71,9 @@ macro_rules! CloneCopy {
         @expand ($_kind:tt $name:ident),
         {
             constr: [$($constr:tt)*],
-            ltimes: [$($ltimes:tt)*],
-            params: [$($params:ident,)*]
-            $($_more_generics:tt)*
+            params: [$($params:tt)*],
+            ltimes: $_ltimes:tt,
+            tnames: [$($tnames:ident,)*],
         },
         {
             preds: [$($preds:tt)*]
@@ -84,8 +83,8 @@ macro_rules! CloneCopy {
     ) => {
         CloneCopy! {
             @as_item
-            impl<$($constr)*> Clone for $name<$($ltimes)* $($params)*>
-            where $($params: Copy,)* $($preds)* {
+            impl<$($constr)*> Clone for $name<$($params)*>
+            where $($tnames: Copy,)* $($preds)* {
                 fn clone(&self) -> Self {
                     *self
                 }

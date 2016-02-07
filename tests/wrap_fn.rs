@@ -22,8 +22,8 @@ macro_rules! wrap_fn {
         $fn_name:ident,
         {
             constr: [$($constr:tt)*],
-            ltimes: $ltimes:tt,
-            params: [$($params:tt)*]
+            params: [$($params:tt)*],
+            $($_generics_tail:tt)*
         },
         (
             $($arg_pats:ident: $arg_tys:ty),* $(,)*

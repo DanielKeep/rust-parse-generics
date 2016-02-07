@@ -22,13 +22,12 @@ macro_rules! Reflect {
             name: $name:ident,
             generics: {
                 constr: [ $($constr:tt)* ],
+                params: [ $($params:tt)* ],
                 ltimes: [ $($ltimes:tt,)* ],
-                params: [ $($params:ident,)* ]
-                $($_generics_tail:tt)*
+                tnames: [ $($tnames:ident,)* ],
             },
             where: {
-                preds: [ $($preds:tt)* ]
-                $($_where_tail:tt)*
+                preds: [ $($preds:tt)* ],
             },
             kind: $_kind:tt,
             fields: $fields:tt,
@@ -37,8 +36,8 @@ macro_rules! Reflect {
     ) => {
         Reflect! {
             @as_item
-            impl<$($constr)*> Reflect for $name<$($ltimes,)* $($params,)*>
-            where $($params: Reflect,)* $($preds)* {
+            impl<$($constr)*> Reflect for $name<$($params)*>
+            where $($tnames: Reflect,)* $($preds)* {
                 fn reflect() -> Type {
                     let fields = Reflect!(@record_fields $fields);
                     let item = Item {
