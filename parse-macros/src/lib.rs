@@ -101,7 +101,7 @@ macro_rules! parse_enum {
             [],
             [],
             { $($body)*, },
-            0
+            0, _ord_00
         }
     };
 
@@ -120,7 +120,7 @@ macro_rules! parse_enum {
         $variants:tt,
         $_attrs:tt,
         { $(,)* },
-        $ord:tt
+        $ord:tt, $_ord_ident:tt
     ) => {
         parse_util! {
             @call $cb,
@@ -143,15 +143,15 @@ macro_rules! parse_enum {
         $variants:tt,
         [$($attrs:tt)*],
         { #[$($attr:tt)*] $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
-        parse_where! {
+        parse_enum! {
             @parse_variants
             $prefix2,
             $variants,
             [$($attrs)* $($attr)*],
             { $($tail)* },
-            $ord
+            $ord, $ord_ident
         }
     };
 
@@ -161,17 +161,17 @@ macro_rules! parse_enum {
         [$($variants:tt)*],
         $attrs:tt,
         { $vname:ident, $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_variants
                 $prefix2,
                 [
                     $($variants)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         kind: unitary,
                         name: $vname,
@@ -193,15 +193,15 @@ macro_rules! parse_enum {
         $variants:tt,
         $attrs:tt,
         { $vname:ident($($body:tt)*), $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_enum! {
             @parse_tuple_fields
-            ($prefix2, $variants, $attrs, $vname, $ord, { $($tail)* }),
+            ($prefix2, $variants, $attrs, $vname, ($ord, $ord_ident), { $($tail)* }),
             [],
             [],
             ($($body)*,),
-            0
+            0, _ord_00
         }
     };
 
@@ -211,15 +211,15 @@ macro_rules! parse_enum {
         $variants:tt,
         $attrs:tt,
         { $vname:ident { $($body:tt)* }, $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_enum! {
             @parse_record_fields
-            ($prefix2, $variants, $attrs, $vname, $ord, { $($tail)* }),
+            ($prefix2, $variants, $attrs, $vname, ($ord, $ord_ident), { $($tail)* }),
             [],
             [],
             { $($body)*, },
-            0
+            0, _ord_00
         }
     };
 
@@ -230,23 +230,23 @@ macro_rules! parse_enum {
             [$($variants:tt)*],
             $attrs:tt,
             $vname:ident,
-            $ord:tt,
+            ($ord:tt, $ord_ident:tt),
             $tail:tt
         ),
         $fields:tt,
         $_fattrs:tt,
         ( $(,)* ),
-        $ford:tt
+        $ford:tt, $ford_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_variants
                 $prefix2,
                 [
                     $($variants)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         kind: tuple,
                         name: $vname,
@@ -268,7 +268,7 @@ macro_rules! parse_enum {
         $fields:tt,
         [$($attrs:tt)*],
         (#[$($attr:tt)*] $($tail:tt)*),
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_enum! {
             @parse_tuple_fields
@@ -276,7 +276,7 @@ macro_rules! parse_enum {
             $fields,
             [$($attrs)* #[$($attr)*]],
             ($($tail)*),
-            $ord
+            $ord, $ord_ident:tt
         }
     };
 
@@ -286,17 +286,17 @@ macro_rules! parse_enum {
         [$($fields:tt)*],
         $attrs:tt,
         (pub $fty:ty, $($tail:tt)*),
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_tuple_fields
                 $prefix3,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (pub),
                         ty: $fty,
@@ -315,17 +315,17 @@ macro_rules! parse_enum {
         [$($fields:tt)*],
         $attrs:tt,
         ($fty:ty, $($tail:tt)*),
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_tuple_fields
                 $prefix3,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (),
                         ty: $fty,
@@ -345,23 +345,23 @@ macro_rules! parse_enum {
             [$($variants:tt)*],
             $attrs:tt,
             $vname:ident,
-            $ord:tt,
+            ($ord:tt, $ord_ident:tt),
             $tail:tt
         ),
         $fields:tt,
         $_fattrs:tt,
         { $(,)* },
-        $ford:tt
+        $ford:tt, $ford_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_variants
                 $prefix2,
                 [
                     $($variants)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         kind: record,
                         name: $vname,
@@ -383,7 +383,7 @@ macro_rules! parse_enum {
         $fields:tt,
         [$($attrs:tt)*],
         { #[$($attr:tt)*] $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_enum! {
             @parse_record_fields
@@ -391,7 +391,7 @@ macro_rules! parse_enum {
             $fields,
             [$($attrs)* #[$($attr)*]],
             { $($tail)* },
-            $ord
+            $ord, $ord_ident
         }
     };
 
@@ -401,17 +401,17 @@ macro_rules! parse_enum {
         [$($fields:tt)*],
         $attrs:tt,
         { pub $fname:ident: $fty:ty, $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_record_fields
                 $prefix3,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (pub),
                         ty: $fty,
@@ -431,17 +431,17 @@ macro_rules! parse_enum {
         [$($fields:tt)*],
         $attrs:tt,
         { $fname:ident: $fty:ty, $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_enum! {
                 @parse_record_fields
                 $prefix3,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (),
                         ty: $fty,
@@ -449,7 +449,7 @@ macro_rules! parse_enum {
                     },
                 ],
                 [],
-                ($($tail)*),
+                { $($tail)* },
             }),
             $ord
         }
@@ -550,7 +550,7 @@ macro_rules! parse_struct {
             [],
             [],
             ($($body)*,),
-            0
+            0, _ord_00
         }
     };
 
@@ -567,7 +567,7 @@ macro_rules! parse_struct {
             [],
             [],
             {$($body)*,},
-            0
+            0, _ord_00
         }
     };
 
@@ -586,7 +586,7 @@ macro_rules! parse_struct {
         $fields:tt,
         $_attrs:tt,
         ($(,)*),
-        $ord:tt
+        $ord:tt, $_ord_ident:tt
     ) => {
         parse_util! {
             @call $cb,
@@ -610,7 +610,7 @@ macro_rules! parse_struct {
         $fields:tt,
         [$($attrs:tt)*],
         (#[$($attr:tt)*] $($tail:tt)*),
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_struct! {
             @parse_fields
@@ -618,7 +618,7 @@ macro_rules! parse_struct {
             $fields,
             [$($attrs)* #[$($attr)*]],
             ($($tail)*),
-            $ord
+            $ord, $ord_ident
         }
     };
 
@@ -628,17 +628,17 @@ macro_rules! parse_struct {
         [$($fields:tt)*],
         $attrs:tt,
         (pub $fty:ty, $($tail:tt)*),
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_struct! {
                 @parse_fields
                 $prefix2,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (pub),
                         ty: $fty,
@@ -657,17 +657,17 @@ macro_rules! parse_struct {
         [$($fields:tt)*],
         $attrs:tt,
         ($fty:ty, $($tail:tt)*),
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_struct! {
                 @parse_fields
                 $prefix2,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (),
                         ty: $fty,
@@ -695,7 +695,7 @@ macro_rules! parse_struct {
         $fields:tt,
         $_attrs:tt,
         { $(,)* },
-        $ord:tt
+        $ord:tt, $_ord_ident:tt
     ) => {
         parse_util! {
             @call $cb,
@@ -719,7 +719,7 @@ macro_rules! parse_struct {
         $fields:tt,
         [$($attrs:tt)*],
         { #[$($attr:tt)*] $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_struct! {
             @parse_fields
@@ -727,7 +727,7 @@ macro_rules! parse_struct {
             $fields,
             [$($attrs)* #[$($attr)*]],
             { $($tail)* },
-            $ord
+            $ord, $ord_ident
         }
     };
 
@@ -737,17 +737,17 @@ macro_rules! parse_struct {
         [$($fields:tt)*],
         $attrs:tt,
         { pub $fname:ident: $fty:ty, $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_struct! {
                 @parse_fields
                 $prefix2,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (pub),
                         name: $fname,
@@ -767,17 +767,17 @@ macro_rules! parse_struct {
         [$($fields:tt)*],
         $attrs:tt,
         { $fname:ident: $fty:ty, $($tail:tt)* },
-        $ord:tt
+        $ord:tt, $ord_ident:tt
     ) => {
         parse_util! {
-            @inc_ord
+            @inc_ord_ident
             (parse_struct! {
                 @parse_fields
                 $prefix2,
                 [
                     $($fields)*
                     {
-                        ord: $ord,
+                        ord: ($ord, $ord_ident),
                         attrs: $attrs,
                         vis: (),
                         name: $fname,
@@ -816,36 +816,36 @@ macro_rules! parse_util {
         }
     };
 
-    (@inc_ord $cb:tt,  0) => { parse_util!{ @call $cb,  1 } };
-    (@inc_ord $cb:tt,  1) => { parse_util!{ @call $cb,  2 } };
-    (@inc_ord $cb:tt,  2) => { parse_util!{ @call $cb,  3 } };
-    (@inc_ord $cb:tt,  3) => { parse_util!{ @call $cb,  4 } };
-    (@inc_ord $cb:tt,  4) => { parse_util!{ @call $cb,  5 } };
-    (@inc_ord $cb:tt,  5) => { parse_util!{ @call $cb,  6 } };
-    (@inc_ord $cb:tt,  6) => { parse_util!{ @call $cb,  7 } };
-    (@inc_ord $cb:tt,  7) => { parse_util!{ @call $cb,  8 } };
-    (@inc_ord $cb:tt,  8) => { parse_util!{ @call $cb,  9 } };
-    (@inc_ord $cb:tt,  9) => { parse_util!{ @call $cb, 10 } };
-    (@inc_ord $cb:tt, 10) => { parse_util!{ @call $cb, 11 } };
-    (@inc_ord $cb:tt, 11) => { parse_util!{ @call $cb, 12 } };
-    (@inc_ord $cb:tt, 12) => { parse_util!{ @call $cb, 13 } };
-    (@inc_ord $cb:tt, 13) => { parse_util!{ @call $cb, 14 } };
-    (@inc_ord $cb:tt, 14) => { parse_util!{ @call $cb, 15 } };
-    (@inc_ord $cb:tt, 15) => { parse_util!{ @call $cb, 16 } };
-    (@inc_ord $cb:tt, 16) => { parse_util!{ @call $cb, 17 } };
-    (@inc_ord $cb:tt, 17) => { parse_util!{ @call $cb, 18 } };
-    (@inc_ord $cb:tt, 18) => { parse_util!{ @call $cb, 19 } };
-    (@inc_ord $cb:tt, 19) => { parse_util!{ @call $cb, 20 } };
-    (@inc_ord $cb:tt, 20) => { parse_util!{ @call $cb, 21 } };
-    (@inc_ord $cb:tt, 21) => { parse_util!{ @call $cb, 22 } };
-    (@inc_ord $cb:tt, 22) => { parse_util!{ @call $cb, 23 } };
-    (@inc_ord $cb:tt, 23) => { parse_util!{ @call $cb, 24 } };
-    (@inc_ord $cb:tt, 24) => { parse_util!{ @call $cb, 25 } };
-    (@inc_ord $cb:tt, 25) => { parse_util!{ @call $cb, 26 } };
-    (@inc_ord $cb:tt, 26) => { parse_util!{ @call $cb, 27 } };
-    (@inc_ord $cb:tt, 27) => { parse_util!{ @call $cb, 28 } };
-    (@inc_ord $cb:tt, 28) => { parse_util!{ @call $cb, 29 } };
-    (@inc_ord $cb:tt, 29) => { parse_util!{ @call $cb, 30 } };
-    (@inc_ord $cb:tt, 30) => { parse_util!{ @call $cb, 31 } };
-    (@inc_ord $cb:tt, 31) => { parse_util!{ @call $cb, 32 } };
+    (@inc_ord_ident $cb:tt,  0) => { parse_util!{ @call $cb,  1, _ord_01 } };
+    (@inc_ord_ident $cb:tt,  1) => { parse_util!{ @call $cb,  2, _ord_02 } };
+    (@inc_ord_ident $cb:tt,  2) => { parse_util!{ @call $cb,  3, _ord_03 } };
+    (@inc_ord_ident $cb:tt,  3) => { parse_util!{ @call $cb,  4, _ord_04 } };
+    (@inc_ord_ident $cb:tt,  4) => { parse_util!{ @call $cb,  5, _ord_05 } };
+    (@inc_ord_ident $cb:tt,  5) => { parse_util!{ @call $cb,  6, _ord_06 } };
+    (@inc_ord_ident $cb:tt,  6) => { parse_util!{ @call $cb,  7, _ord_07 } };
+    (@inc_ord_ident $cb:tt,  7) => { parse_util!{ @call $cb,  8, _ord_08 } };
+    (@inc_ord_ident $cb:tt,  8) => { parse_util!{ @call $cb,  9, _ord_09 } };
+    (@inc_ord_ident $cb:tt,  9) => { parse_util!{ @call $cb, 10, _ord_10 } };
+    (@inc_ord_ident $cb:tt, 10) => { parse_util!{ @call $cb, 11, _ord_11 } };
+    (@inc_ord_ident $cb:tt, 11) => { parse_util!{ @call $cb, 12, _ord_12 } };
+    (@inc_ord_ident $cb:tt, 12) => { parse_util!{ @call $cb, 13, _ord_13 } };
+    (@inc_ord_ident $cb:tt, 13) => { parse_util!{ @call $cb, 14, _ord_14 } };
+    (@inc_ord_ident $cb:tt, 14) => { parse_util!{ @call $cb, 15, _ord_15 } };
+    (@inc_ord_ident $cb:tt, 15) => { parse_util!{ @call $cb, 16, _ord_16 } };
+    (@inc_ord_ident $cb:tt, 16) => { parse_util!{ @call $cb, 17, _ord_17 } };
+    (@inc_ord_ident $cb:tt, 17) => { parse_util!{ @call $cb, 18, _ord_18 } };
+    (@inc_ord_ident $cb:tt, 18) => { parse_util!{ @call $cb, 19, _ord_19 } };
+    (@inc_ord_ident $cb:tt, 19) => { parse_util!{ @call $cb, 20, _ord_20 } };
+    (@inc_ord_ident $cb:tt, 20) => { parse_util!{ @call $cb, 21, _ord_21 } };
+    (@inc_ord_ident $cb:tt, 21) => { parse_util!{ @call $cb, 22, _ord_22 } };
+    (@inc_ord_ident $cb:tt, 22) => { parse_util!{ @call $cb, 23, _ord_23 } };
+    (@inc_ord_ident $cb:tt, 23) => { parse_util!{ @call $cb, 24, _ord_24 } };
+    (@inc_ord_ident $cb:tt, 24) => { parse_util!{ @call $cb, 25, _ord_25 } };
+    (@inc_ord_ident $cb:tt, 25) => { parse_util!{ @call $cb, 26, _ord_26 } };
+    (@inc_ord_ident $cb:tt, 26) => { parse_util!{ @call $cb, 27, _ord_27 } };
+    (@inc_ord_ident $cb:tt, 27) => { parse_util!{ @call $cb, 28, _ord_28 } };
+    (@inc_ord_ident $cb:tt, 28) => { parse_util!{ @call $cb, 29, _ord_29 } };
+    (@inc_ord_ident $cb:tt, 29) => { parse_util!{ @call $cb, 30, _ord_30 } };
+    (@inc_ord_ident $cb:tt, 30) => { parse_util!{ @call $cb, 31, _ord_31 } };
+    (@inc_ord_ident $cb:tt, 31) => { parse_util!{ @call $cb, 32, _ord_32 } };
 }
