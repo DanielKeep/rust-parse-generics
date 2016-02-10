@@ -7,3 +7,5 @@ authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 parse-generics-poc = { path="../" }
 
 custom_derive = "0.1.4"
+serde = "0.6.11"
+serde_json = "0.6.0"
