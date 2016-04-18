@@ -91,7 +91,7 @@ impl MacResult for MacMac {
         let sp = self.mac.span;
         Some(P(ast::Expr {
             id: ast::DUMMY_NODE_ID,
-            node: ast::ExprMac(self.mac),
+            node: ast::ExprKind::Mac(self.mac),
             span: sp,
             attrs: None,
         }))
@@ -103,50 +103,51 @@ impl MacResult for MacMac {
             ident: token::special_idents::invalid,
             attrs: vec![],
             id: ast::DUMMY_NODE_ID,
-            node: ast::ItemMac(self.mac),
+            node: ast::ItemKind::Mac(self.mac),
             vis: ast::Visibility::Inherited,
             span: sp,
         })))
     }
 
-    fn make_impl_items(self: Box<Self>) -> Option<SmallVector<P<ast::ImplItem>>> {
+    fn make_impl_items(self: Box<Self>) -> Option<SmallVector<ast::ImplItem>> {
         let sp = self.mac.span;
-        Some(SmallVector::one(P(ast::ImplItem {
+        Some(SmallVector::one(ast::ImplItem {
             id: ast::DUMMY_NODE_ID,
             ident: token::special_idents::invalid,
             vis: ast::Visibility::Inherited,
+            defaultness: ast::Defaultness::Final, // FIXME: this is a guess
             attrs: vec![],
             node: ast::ImplItemKind::Macro(self.mac),
             span: sp,
-        })))
+        }))
     }
 
     fn make_pat(self: Box<Self>) -> Option<P<ast::Pat>> {
         let sp = self.mac.span;
         Some(P(ast::Pat {
             id: ast::DUMMY_NODE_ID,
-            node: ast::PatMac(self.mac),
+            node: ast::PatKind::Mac(self.mac),
             span: sp,
         }))
     }
 
-    fn make_stmts(self: Box<Self>) -> Option<SmallVector<P<ast::Stmt>>> {
+    fn make_stmts(self: Box<Self>) -> Option<SmallVector<ast::Stmt>> {
         let sp = self.mac.span;
-        Some(SmallVector::one(P(codemap::respan(
+        Some(SmallVector::one(codemap::respan(
             sp,
-            ast::StmtMac(
+            ast::StmtKind::Mac(
                 P(self.mac),
-                ast::MacStmtStyle::MacStmtWithBraces, // FIXME: this is a guess
+                ast::MacStmtStyle::Braces, // FIXME: this is a guess
                 None,
             )
-        ))))
+        )))
     }
 
     fn make_ty(self: Box<Self>) -> Option<P<ast::Ty>> {
         let sp = self.mac.span;
         Some(P(ast::Ty {
             id: ast::DUMMY_NODE_ID,
-            node: ast::TyMac(self.mac),
+            node: ast::TyKind::Mac(self.mac),
             span: sp,
         }))
     }
