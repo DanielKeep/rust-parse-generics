@@ -146,7 +146,7 @@ custom_derive! {
 
 #[test]
 fn test_iter_f() {
-    let mut it = IterF(once("you pop"));
+    let it = IterF(once("you pop"));
     for e in it {
         assert!(e != "stop");
     }
@@ -159,7 +159,7 @@ custom_derive! {
 
 #[test]
 fn test_iter_g() {
-    let mut it = IterG(once("you pop"));
+    let it = IterG(once("you pop"));
     for e in it {
         assert!(e != "stop");
     }
