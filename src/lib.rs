@@ -33,6 +33,15 @@ macro_rules! delim_tt {
             close_span: DUM_SP,
         }))
     };
+
+    ({} <- $e:expr) => {
+        TokenTree::Delimited(DUM_SP, Rc::new(ast::Delimited {
+            delim: DelimToken::Brace,
+            open_span: DUM_SP,
+            tts: $e,
+            close_span: DUM_SP,
+        }))
+    };
 }
 
 macro_rules! throw {
@@ -181,12 +190,53 @@ fn parse_where(
     }
 }
 
+#[derive(Eq, PartialEq)]
+enum GenericField {
+    Constr,
+    Params,
+    LTimes,
+    TNames,
+}
+
 fn try_parse_generics<'cx>(
     cx: &mut ExtCtxt<'cx>,
     _sp: codemap::Span,
     tts: &[TokenTree]
 ) -> Result<Box<MacResult + 'static>, Error<'cx>> {
-    let tts = try!(skip_ident_str("then", tts));
+    let mut fields = vec![];
+
+    let mut tts = tts;
+    loop {
+        let (ident_sp, ident, tts_) = try!(eat_ident(tts));
+        tts = tts_;
+
+        let ident = &*ident.name.as_str();
+
+        macro_rules! handle_field {
+            ($name:ident, $var:ident) => {
+                {
+                    if fields.contains(&GenericField::$var) {
+                        return Err(Error::span_err(ident_sp,
+                            concat!("cannot use `", stringify!($name),
+                                "` more than once")));
+                    }
+                    tts = try!(skip_token(Token::Comma, tts));
+                    fields.push(GenericField::$var);
+                }
+            };
+        }
+
+        match ident {
+            "constr" => handle_field!(constr, Constr),
+            "params" => handle_field!(params, Params),
+            "ltimes" => handle_field!(ltimes, LTimes),
+            "tnames" => handle_field!(tnames, TNames),
+            "then" => break,
+            _ => return Err(Error::span_err(ident_sp,
+                format!("unexpected token `{}`", ident)))
+        }
+    }
+
     let (callback_sp, callback, tts) = try!(eat_ident(tts));
     let tts = try!(skip_token(Token::Not, tts));
     let (callback_args, tts) = try!(eat_delim(tts));
@@ -237,27 +287,42 @@ fn try_parse_generics<'cx>(
 
     let mut ex_tts = callback_args.tts.clone();
 
-    ex_tts.push(delim_tt!({
-        ident_str_tt("constr"),
-        tok_tt(Token::Colon),
-        delim_tt!([] <- constr),
-        tok_tt(Token::Comma),
+    let mut ex_fields = vec![];
+    let mut constr = Some(constr);
+    let mut params = Some(params);
+    let mut ltimes = Some(ltimes);
+    let mut tnames = Some(tnames);
 
-        ident_str_tt("params"),
-        tok_tt(Token::Colon),
-        delim_tt!([] <- params),
-        tok_tt(Token::Comma),
+    for field in fields {
+        match field {
+            GenericField::Constr => {
+                ex_fields.push(ident_str_tt("constr"));
+                ex_fields.push(tok_tt(Token::Colon));
+                ex_fields.push(delim_tt!([] <- constr.take().unwrap()));
+                ex_fields.push(tok_tt(Token::Comma));
+            },
+            GenericField::Params => {
+                ex_fields.push(ident_str_tt("params"));
+                ex_fields.push(tok_tt(Token::Colon));
+                ex_fields.push(delim_tt!([] <- params.take().unwrap()));
+                ex_fields.push(tok_tt(Token::Comma));
+            },
+            GenericField::LTimes => {
+                ex_fields.push(ident_str_tt("ltimes"));
+                ex_fields.push(tok_tt(Token::Colon));
+                ex_fields.push(delim_tt!([] <- ltimes.take().unwrap()));
+                ex_fields.push(tok_tt(Token::Comma));
+            },
+            GenericField::TNames => {
+                ex_fields.push(ident_str_tt("tnames"));
+                ex_fields.push(tok_tt(Token::Colon));
+                ex_fields.push(delim_tt!([] <- tnames.take().unwrap()));
+                ex_fields.push(tok_tt(Token::Comma));
+            },
+        }
+    }
 
-        ident_str_tt("ltimes"),
-        tok_tt(Token::Colon),
-        delim_tt!([] <- ltimes),
-        tok_tt(Token::Comma),
-
-        ident_str_tt("tnames"),
-        tok_tt(Token::Colon),
-        delim_tt!([] <- tnames),
-        tok_tt(Token::Comma),
-    }));
+    ex_tts.push(delim_tt!({} <- ex_fields));
     ex_tts.push(tok_tt(Token::Comma));
 
     {
@@ -285,12 +350,47 @@ fn try_parse_generics<'cx>(
     Ok(res as Box<MacResult + 'static>)
 }
 
+#[derive(Eq, PartialEq)]
+enum WhereField {
+    Preds,
+}
+
 fn try_parse_where<'a>(
     cx: &mut ExtCtxt<'a>,
     _sp: codemap::Span,
     tts: &[TokenTree]
 ) -> Result<Box<MacResult + 'static>, Error<'a>> {
-    let tts = try!(skip_ident_str("then", tts));
+    let mut fields = vec![];
+
+    let mut tts = tts;
+    loop {
+        let (ident_sp, ident, tts_) = try!(eat_ident(tts));
+        tts = tts_;
+
+        let ident = &*ident.name.as_str();
+
+        macro_rules! handle_field {
+            ($name:ident, $var:ident) => {
+                {
+                    if fields.contains(&WhereField::$var) {
+                        return Err(Error::span_err(ident_sp,
+                            concat!("cannot use `", stringify!($name),
+                                "` more than once")));
+                    }
+                    tts = try!(skip_token(Token::Comma, tts));
+                    fields.push(WhereField::$var);
+                }
+            };
+        }
+
+        match ident {
+            "preds" => handle_field!(preds, Preds),
+            "then" => break,
+            _ => return Err(Error::span_err(ident_sp,
+                format!("unexpected token `{}`", ident)))
+        }
+    }
+
     let (callback_sp, callback, tts) = try!(eat_ident(tts));
     let tts = try!(skip_token(Token::Not, tts));
     let (callback_args, tts) = try!(eat_delim(tts));
@@ -314,12 +414,21 @@ fn try_parse_where<'a>(
 
     let mut ex_tts = callback_args.tts.clone();
 
-    ex_tts.push(delim_tt!({
-        ident_str_tt("preds"),
-        tok_tt(Token::Colon),
-        delim_tt!([] <- preds),
-        tok_tt(Token::Comma),
-    }));
+    let mut ex_fields = vec![];
+    let mut preds = Some(preds);
+
+    for field in fields {
+        match field {
+            WhereField::Preds => {
+                ex_fields.push(ident_str_tt("preds"));
+                ex_fields.push(tok_tt(Token::Colon));
+                ex_fields.push(delim_tt!([] <- preds.take().unwrap()));
+                ex_fields.push(tok_tt(Token::Comma));
+            },
+        }
+    }
+
+    ex_tts.push(delim_tt!({} <- ex_fields));
     ex_tts.push(tok_tt(Token::Comma));
 
     {
@@ -366,23 +475,6 @@ fn eat_ident(tts: &[TokenTree])
         Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
             "expected identifier")),
         None => throw!(Error::err("expected identifier"))
-    }
-}
-
-fn skip_ident_str<'a>(s: &str, tts: &'a [TokenTree])
--> Result<&'a [TokenTree], Error<'static>> {
-    match tts.get(0) {
-        Some(&TokenTree::Token(_,
-            Token::Ident(ast::Ident {
-                ref name,
-                ctxt: _,
-            }, _))) if name.as_str() == s
-        => {
-            Ok(&tts[1..])
-        },
-        Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
-            format!("expected `{}`", s))),
-        None => throw!(Error::err(format!("expected `{}`", s)))
     }
 }
 

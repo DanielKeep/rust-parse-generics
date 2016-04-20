@@ -10,6 +10,7 @@ macro_rules! Iterator {
         () $(pub)* struct $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then Iterator!(@with_generics () struct $name,),
             $($tail)*
         }
@@ -23,7 +24,7 @@ macro_rules! Iterator {
         $($tail:tt)*
     ) => {
         parse_where! {
-            then Iterator!(@with_where () struct $name, $generics,),
+            preds, then Iterator!(@with_where () struct $name, $generics,),
             $($tail)* ($($body)*)
         }
     };

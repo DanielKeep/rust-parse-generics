@@ -51,6 +51,7 @@ macro_rules! parse_enum {
         $(#[$($attrs:tt)*])* pub enum $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then parse_enum! {
                 @with_generics
                 (($cb!$cb_arg), [$(#[$($attrs)*])*], (pub), $name),
@@ -64,6 +65,7 @@ macro_rules! parse_enum {
         $(#[$($attrs:tt)*])* enum $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then parse_enum! {
                 @with_generics
                 (($cb!$cb_arg), [$(#[$($attrs)*])*], (), $name),
@@ -79,7 +81,7 @@ macro_rules! parse_enum {
         $($tail:tt)*
     ) => {
         parse_where! {
-            then parse_enum! {
+            preds, then parse_enum! {
                 @with_where
                 $prefix,
                 $generics,
@@ -459,6 +461,7 @@ macro_rules! parse_struct {
         $(#[$($attrs:tt)*])* pub struct $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then parse_struct! {
                 @with_generics
                 (($cb!$cb_arg), [$(#[$($attrs)*])*], (pub), $name),
@@ -472,6 +475,7 @@ macro_rules! parse_struct {
         $(#[$($attrs:tt)*])* struct $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then parse_struct! {
                 @with_generics
                 (($cb!$cb_arg), [$(#[$($attrs)*])*], (), $name),
@@ -487,7 +491,7 @@ macro_rules! parse_struct {
         ($($body:tt)*) $($tail:tt)*
     ) => {
         parse_where! {
-            then parse_struct! {
+            preds, then parse_struct! {
                 @with_where
                 $prefix, $generics,
             },
@@ -502,7 +506,7 @@ macro_rules! parse_struct {
         $($tail:tt)*
     ) => {
         parse_where! {
-            then parse_struct! {
+            preds, then parse_struct! {
                 @with_where
                 $prefix, $generics,
             },

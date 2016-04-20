@@ -7,6 +7,7 @@ macro_rules! CloneCopy {
         () $(pub)* enum $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then CloneCopy! { @with_generics (enum $name), },
             $($tail)*
         }
@@ -16,6 +17,7 @@ macro_rules! CloneCopy {
         () $(pub)* struct $name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then CloneCopy! { @with_generics (struct $name), },
             $($tail)*
         }
@@ -28,7 +30,7 @@ macro_rules! CloneCopy {
         $($tail:tt)*
     ) => {
         parse_where! {
-            then CloneCopy! { @expand $prefix, $generics, },
+            preds, then CloneCopy! { @expand $prefix, $generics, },
             $($tail)* ($($body)*)
         }
     };
@@ -39,7 +41,7 @@ macro_rules! CloneCopy {
         $($tail:tt)*
     ) => {
         parse_where! {
-            then CloneCopy! { @expand $prefix, $generics, },
+            preds, then CloneCopy! { @expand $prefix, $generics, },
             $($tail)*
         }
     };

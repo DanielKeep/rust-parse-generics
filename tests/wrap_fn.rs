@@ -9,6 +9,7 @@ macro_rules! wrap_fn {
         fn $fn_name:ident $($tail:tt)*
     ) => {
         parse_generics! {
+            constr, params, ltimes, tnames,
             then wrap_fn!(@expand $wrap_name, $fn_name,),
             $($tail)*
         }
