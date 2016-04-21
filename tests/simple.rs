@@ -30,6 +30,14 @@ fn test_simple() {
     );
 
     assert_eq_str!(
+        parse_generics!({ params, mrtnames?, tnames?, bunnies? }, then stringify!(),),
+        "{ \
+            params : [  ] , \
+            tnames : [  ] , \
+        } ,"
+    );
+
+    assert_eq_str!(
         parse_generics!({ constr, params, ltimes, tnames }, then stringify!(W),),
         "W { \
             constr : [  ] , \

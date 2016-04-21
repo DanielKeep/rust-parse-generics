@@ -50,6 +50,29 @@ macro_rules! throw {
     };
 }
 
+macro_rules! handle_field_general {
+    ($fields:ident, $tts:ident, $ident_sp:expr, $name:ident, $var:expr) => {
+        {
+            if $fields.contains(&$var) {
+                return Err(Error::span_err($ident_sp,
+                    concat!("cannot use `", stringify!($name),
+                        "` more than once")));
+            }
+            $fields.push($var);
+
+            if let Ok(tts_) = can_skip_token(Token::Question, $tts) {
+                $tts = tts_;
+            }
+
+            if let Ok(tts_) = can_skip_token(Token::Comma, $tts) {
+                $tts = tts_;
+            } else {
+                break;
+            }
+        }
+    };
+}
+
 #[plugin_registrar]
 #[doc(hidden)]
 pub fn plugin_registrar(reg: &mut rustc_plugin::Registry) {
@@ -224,19 +247,7 @@ fn try_parse_generics<'cx>(
 
         macro_rules! handle_field {
             ($name:ident, $var:ident) => {
-                {
-                    if fields.contains(&GenericField::$var) {
-                        return Err(Error::span_err(ident_sp,
-                            concat!("cannot use `", stringify!($name),
-                                "` more than once")));
-                    }
-                    fields.push(GenericField::$var);
-                    if let Ok(field_tts_) = can_skip_token(Token::Comma, field_tts) {
-                        field_tts = field_tts_;
-                    } else {
-                        break;
-                    }
-                }
+                handle_field_general!(fields, field_tts, ident_sp, $name, GenericField::$var)
             };
         }
 
@@ -245,8 +256,15 @@ fn try_parse_generics<'cx>(
             "params" => handle_field!(params, Params),
             "ltimes" => handle_field!(ltimes, LTimes),
             "tnames" => handle_field!(tnames, TNames),
-            _ => return Err(Error::span_err(ident_sp,
-                format!("unexpected token `{}`", ident)))
+            _ => {
+                if let Ok(field_tts_) = can_skip_token(Token::Question, field_tts) {
+                    // Ignore this ident.
+                    field_tts = can_skip_token(Token::Comma, field_tts_).unwrap_or(field_tts_);
+                } else {
+                    return Err(Error::span_err(ident_sp,
+                        format!("unexpected token `{}`", ident)))
+                }
+            }
         }
     }
 
@@ -398,26 +416,21 @@ fn try_parse_where<'a>(
 
         macro_rules! handle_field {
             ($name:ident, $var:ident) => {
-                {
-                    if fields.contains(&WhereField::$var) {
-                        return Err(Error::span_err(ident_sp,
-                            concat!("cannot use `", stringify!($name),
-                                "` more than once")));
-                    }
-                    fields.push(WhereField::$var);
-                    if let Ok(field_tts_) = can_skip_token(Token::Comma, field_tts) {
-                        field_tts = field_tts_;
-                    } else {
-                        break;
-                    }
-                }
+                handle_field_general!(fields, field_tts, ident_sp, $name, WhereField::$var)
             };
         }
 
         match ident {
             "preds" => handle_field!(preds, Preds),
-            _ => return Err(Error::span_err(ident_sp,
-                format!("unexpected token `{}`", ident)))
+            _ => {
+                if let Ok(field_tts_) = can_skip_token(Token::Question, field_tts) {
+                    // Ignore this ident.
+                    field_tts = can_skip_token(Token::Comma, field_tts_).unwrap_or(field_tts_);
+                } else {
+                    return Err(Error::span_err(ident_sp,
+                        format!("unexpected token `{}`", ident)))
+                }
+            }
         }
     }
 
