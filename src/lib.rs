@@ -205,10 +205,20 @@ fn try_parse_generics<'cx>(
 ) -> Result<Box<MacResult + 'static>, Error<'cx>> {
     let mut fields = vec![];
 
-    let mut tts = tts;
-    loop {
-        let (ident_sp, ident, tts_) = try!(eat_ident(tts));
-        tts = tts_;
+    let (field_tt, tts) = try!(eat_delim_brace(tts));
+    let mut field_tts = &field_tt.tts[..];
+
+    if is_just_dotdot(field_tts) {
+        fields.push(GenericField::Constr);
+        fields.push(GenericField::Params);
+        fields.push(GenericField::LTimes);
+        fields.push(GenericField::TNames);
+        field_tts = &[];
+    }
+
+    while field_tts.len() > 0 {
+        let (ident_sp, ident, field_tts_) = try!(eat_ident(field_tts));
+        field_tts = field_tts_;
 
         let ident = &*ident.name.as_str();
 
@@ -220,8 +230,12 @@ fn try_parse_generics<'cx>(
                             concat!("cannot use `", stringify!($name),
                                 "` more than once")));
                     }
-                    tts = try!(skip_token(Token::Comma, tts));
                     fields.push(GenericField::$var);
+                    if let Ok(field_tts_) = can_skip_token(Token::Comma, field_tts) {
+                        field_tts = field_tts_;
+                    } else {
+                        break;
+                    }
                 }
             };
         }
@@ -231,12 +245,18 @@ fn try_parse_generics<'cx>(
             "params" => handle_field!(params, Params),
             "ltimes" => handle_field!(ltimes, LTimes),
             "tnames" => handle_field!(tnames, TNames),
-            "then" => break,
             _ => return Err(Error::span_err(ident_sp,
                 format!("unexpected token `{}`", ident)))
         }
     }
 
+    if let Some(ref tt) = field_tts.first() {
+        throw!(Error::span_err(tt.get_span(),
+            format!("unexpected token `{:?}`", tt)));
+    }
+
+    let tts = try!(skip_token(Token::Comma, tts));
+    let tts = try!(skip_ident_str("then", tts));
     let (callback_sp, callback, tts) = try!(eat_ident(tts));
     let tts = try!(skip_token(Token::Not, tts));
     let (callback_args, tts) = try!(eat_delim(tts));
@@ -362,10 +382,17 @@ fn try_parse_where<'a>(
 ) -> Result<Box<MacResult + 'static>, Error<'a>> {
     let mut fields = vec![];
 
-    let mut tts = tts;
-    loop {
-        let (ident_sp, ident, tts_) = try!(eat_ident(tts));
-        tts = tts_;
+    let (field_tt, tts) = try!(eat_delim_brace(tts));
+    let mut field_tts = &field_tt.tts[..];
+
+    if is_just_dotdot(field_tts) {
+        fields.push(WhereField::Preds);
+        field_tts = &[];
+    }
+
+    while field_tts.len() > 0 {
+        let (ident_sp, ident, field_tts_) = try!(eat_ident(field_tts));
+        field_tts = field_tts_;
 
         let ident = &*ident.name.as_str();
 
@@ -377,20 +404,30 @@ fn try_parse_where<'a>(
                             concat!("cannot use `", stringify!($name),
                                 "` more than once")));
                     }
-                    tts = try!(skip_token(Token::Comma, tts));
                     fields.push(WhereField::$var);
+                    if let Ok(field_tts_) = can_skip_token(Token::Comma, field_tts) {
+                        field_tts = field_tts_;
+                    } else {
+                        break;
+                    }
                 }
             };
         }
 
         match ident {
             "preds" => handle_field!(preds, Preds),
-            "then" => break,
             _ => return Err(Error::span_err(ident_sp,
                 format!("unexpected token `{}`", ident)))
         }
     }
 
+    if let Some(ref tt) = field_tts.first() {
+        throw!(Error::span_err(tt.get_span(),
+            format!("unexpected token `{:?}`", tt)));
+    }
+
+    let tts = try!(skip_token(Token::Comma, tts));
+    let tts = try!(skip_ident_str("then", tts));
     let (callback_sp, callback, tts) = try!(eat_ident(tts));
     let tts = try!(skip_token(Token::Not, tts));
     let (callback_args, tts) = try!(eat_delim(tts));
@@ -456,6 +493,14 @@ fn try_parse_where<'a>(
     Ok(res as Box<MacResult + 'static>)
 }
 
+fn is_just_dotdot(tts: &[TokenTree]) -> bool {
+    if tts.len() != 1 { return false; }
+    match tts[0] {
+        TokenTree::Token(_, Token::DotDot) => true,
+        _ => false,
+    }
+}
+
 fn eat_delim(tts: &[TokenTree])
 -> Result<(&ast::Delimited, &[TokenTree]), Error<'static>> {
     match tts.get(0) {
@@ -463,6 +508,17 @@ fn eat_delim(tts: &[TokenTree])
         Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
             "expected delimited sequence")),
         None => throw!(Error::err("expected delimited sequence"))
+    }
+}
+
+fn eat_delim_brace(tts: &[TokenTree])
+-> Result<(&ast::Delimited, &[TokenTree]), Error<'static>> {
+    match tts.get(0) {
+        Some(&TokenTree::Delimited(_, ref delim))
+            if delim.delim == DelimToken::Brace => Ok((&**delim, &tts[1..])),
+        Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
+            "expected brace-delimited sequence")),
+        None => throw!(Error::err("expected brace-delimited sequence"))
     }
 }
 
@@ -477,14 +533,38 @@ fn eat_ident(tts: &[TokenTree])
         None => throw!(Error::err("expected identifier"))
     }
 }
+ 
+fn skip_ident_str<'a>(s: &str, tts: &'a [TokenTree])
+-> Result<&'a [TokenTree], Error<'static>> {
+    match tts.get(0) {
+        Some(&TokenTree::Token(_,
+            Token::Ident(ast::Ident {
+                ref name,
+                ctxt: _,
+            }, _))) if name.as_str() == s
+        => {
+            Ok(&tts[1..])
+        },
+        Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
+            format!("expected `{}`", s))),
+        None => throw!(Error::err(format!("expected `{}`", s)))
+    }
+}
 
 fn skip_token(tok: Token, tts: &[TokenTree]) -> Result<&[TokenTree], Error<'static>> {
-    match tts.get(0) {
-        Some(&TokenTree::Token(_, ref got_tok)) if *got_tok == tok
-        => Ok(&tts[1..]),
-        Some(&ref tt) => throw!(Error::span_err(tt.get_span(),
+    match can_skip_token(tok.clone(), tts) {
+        Ok(v) => Ok(v),
+        Err(Some(tt)) => throw!(Error::span_err(tt.get_span(),
             format!("expected `{:?}`", tok))),
-        None => throw!(Error::err(format!("expected `{:?}`", tok)))
+        Err(None) => throw!(Error::err(format!("expected `{:?}`", tok))),
+    }
+}
+
+fn can_skip_token(tok: Token, tts: &[TokenTree]) -> Result<&[TokenTree], Option<&TokenTree>> {
+    match tts.get(0) {
+        Some(&TokenTree::Token(_, ref got_tok)) if *got_tok == tok => Ok(&tts[1..]),
+        Some(tt) => Err(Some(tt)),
+        None => Err(None),
     }
 }
 

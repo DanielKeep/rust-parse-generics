@@ -10,7 +10,7 @@ macro_rules! assert_eq_str {
 #[test]
 fn test_simple() {
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),),
         "{ \
             constr : [  ] , \
             params : [  ] , \
@@ -20,7 +20,17 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(W),),
+        parse_generics!({ .. }, then stringify!(),),
+        "{ \
+            constr : [  ] , \
+            params : [  ] , \
+            ltimes : [  ] , \
+            tnames : [  ] , \
+        } ,"
+    );
+
+    assert_eq_str!(
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(W),),
         "W { \
             constr : [  ] , \
             params : [  ] , \
@@ -30,7 +40,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <>),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <>),
         "{ \
             constr : [  ] , \
             params : [  ] , \
@@ -40,7 +50,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), X),
         "{ \
             constr : [  ] , \
             params : [  ] , \
@@ -50,7 +60,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <> X),
         "{ \
             constr : [  ] , \
             params : [  ] , \
@@ -60,7 +70,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), 'a X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), 'a X),
         "{ \
             constr : [  ] , \
             params : [  ] , \
@@ -70,7 +80,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <'a> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <'a> X),
         "{ \
             constr : [ 'a , ] , \
             params : [ 'a , ] , \
@@ -80,7 +90,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <'a, 'b> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <'a, 'b> X),
         "{ \
             constr : [ 'a , 'b , ] , \
             params : [ 'a , 'b , ] , \
@@ -90,7 +100,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T> X),
         "{ \
             constr : [ T , ] , \
             params : [ T , ] , \
@@ -100,7 +110,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T, U> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T, U> X),
         "{ \
             constr : [ T , U , ] , \
             params : [ T , U , ] , \
@@ -110,7 +120,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <'a, 'b: 'a> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <'a, 'b: 'a> X),
         "{ \
             constr : [ 'a , 'b : 'a , ] , \
             params : [ 'a , 'b , ] , \
@@ -120,7 +130,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <'a, 'b: 'a + 'c> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <'a, 'b: 'a + 'c> X),
         "{ \
             constr : [ 'a , 'b : 'a + 'c , ] , \
             params : [ 'a , 'b , ] , \
@@ -130,7 +140,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T: Copy> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T: Copy> X),
         "{ \
             constr : [ T : Copy , ] , \
             params : [ T , ] , \
@@ -140,7 +150,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T: std::marker::Copy> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T: std::marker::Copy> X),
         "{ \
             constr : [ T : std :: marker :: Copy , ] , \
             params : [ T , ] , \
@@ -150,7 +160,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T: ::std::marker::Copy> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T: ::std::marker::Copy> X),
         "{ \
             constr : [ T : :: std :: marker :: Copy , ] , \
             params : [ T , ] , \
@@ -160,7 +170,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T: 'a> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T: 'a> X),
         "{ \
             constr : [ T : 'a , ] , \
             params : [ T , ] , \
@@ -170,7 +180,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T: 'a + Copy + Clone> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T: 'a + Copy + Clone> X),
         "{ \
             constr : [ T : 'a + Copy + Clone , ] , \
             params : [ T , ] , \
@@ -180,7 +190,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(), <T: 'a + 'b + Copy + Clone> X),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(), <T: 'a + 'b + Copy + Clone> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone , ] , \
             params : [ T , ] , \
@@ -190,7 +200,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn()> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
@@ -202,7 +212,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn() -> &'c i32> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
@@ -214,7 +224,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32)> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
@@ -226,7 +236,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32) -> &'d ()> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
@@ -238,7 +248,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <'a, 'b, 'd, T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32) -> &'d ()> X),
         "{ \
             constr : [ 'a , 'b , 'd , T : 'a + 'b + Copy + Clone \
@@ -250,7 +260,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: for<> Copy> X),
         "{ \
             constr : [ T : Copy , ] , \
@@ -261,7 +271,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, ltimes, tnames, then stringify!(),
+        parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: ::std::convert::Into<String>> X),
         "{ \
             constr : [ T : :: std :: convert :: Into < String , > , ] , \
@@ -272,40 +282,40 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({}, then stringify!(), <'a: 'b, T: U> X),
         "{  } , X"
     );
 
     assert_eq_str!(
-        parse_generics!(constr, then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({ constr }, then stringify!(), <'a: 'b, T: U> X),
         "{ \
             constr : [ 'a : 'b , T : U , ] , \
         } , X"
     );
 
     assert_eq_str!(
-        parse_generics!(params, then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({ params }, then stringify!(), <'a: 'b, T: U> X),
         "{ \
             params : [ 'a , T , ] , \
         } , X"
     );
 
     assert_eq_str!(
-        parse_generics!(ltimes, then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({ ltimes }, then stringify!(), <'a: 'b, T: U> X),
         "{ \
             ltimes : [ 'a , ] , \
         } , X"
     );
 
     assert_eq_str!(
-        parse_generics!(tnames, then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({ tnames }, then stringify!(), <'a: 'b, T: U> X),
         "{ \
             tnames : [ T , ] , \
         } , X"
     );
 
     assert_eq_str!(
-        parse_generics!(constr, params, then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({ constr, params }, then stringify!(), <'a: 'b, T: U> X),
         "{ \
             constr : [ 'a : 'b , T : U , ] , \
             params : [ 'a , T , ] , \
@@ -313,7 +323,7 @@ fn test_simple() {
     );
 
     assert_eq_str!(
-        parse_generics!(params, constr, then stringify!(), <'a: 'b, T: U> X),
+        parse_generics!({ params, constr }, then stringify!(), <'a: 'b, T: U> X),
         "{ \
             params : [ 'a , T , ] , \
             constr : [ 'a : 'b , T : U , ] , \
@@ -324,42 +334,47 @@ fn test_simple() {
 #[test]
 fn test_simple_where() {
     assert_eq_str!(
-        parse_where!(preds, then stringify!(),),
+        parse_where!({ preds }, then stringify!(),),
         "{ preds : [  ] , } ,"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(), X),
+        parse_where!({ .. }, then stringify!(),),
+        "{ preds : [  ] , } ,"
+    );
+
+    assert_eq_str!(
+        parse_where!({ preds }, then stringify!(), X),
         "{ preds : [  ] , } , X"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(), {} X),
+        parse_where!({ preds }, then stringify!(), {} X),
         "{ preds : [  ] , } , {  } X"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(), where T: Copy {X}),
+        parse_where!({ preds }, then stringify!(), where T: Copy {X}),
         "{ preds : [ T : Copy , ] , } , { X }"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(), where T: Copy, {X}),
+        parse_where!({ preds }, then stringify!(), where T: Copy, {X}),
         "{ preds : [ T : Copy , ] , } , { X }"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(), where T: Copy; {X}),
+        parse_where!({ preds }, then stringify!(), where T: Copy; {X}),
         "{ preds : [ T : Copy , ] , } , ; { X }"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(), where for<'a> &'a str: Into<T> {X}),
+        parse_where!({ preds }, then stringify!(), where for<'a> &'a str: Into<T> {X}),
         "{ preds : [ for < 'a > &'a str : Into < T , > , ] , } , { X }"
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(),
+        parse_where!({ preds }, then stringify!(),
             where for<'a: 'b, 'b> &'a str: Into<T+'b> {X}),
         "{ \
             preds : [ \
@@ -369,7 +384,7 @@ fn test_simple_where() {
     );
 
     assert_eq_str!(
-        parse_where!(preds, then stringify!(),
+        parse_where!({ preds }, then stringify!(),
             where &'a str: Into<T+'b>, 'a: 'b, 'b: 'c + 'd {X}),
         "{ \
             preds : [ \
@@ -381,7 +396,7 @@ fn test_simple_where() {
     );
 
     assert_eq_str!(
-        parse_where!(then stringify!(), where T: Copy {X}),
+        parse_where!({}, then stringify!(), where T: Copy {X}),
         "{  } , { X }"
     );
 }
