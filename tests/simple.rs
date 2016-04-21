@@ -26,6 +26,7 @@ fn test_simple() {
             params : [  ] , \
             ltimes : [  ] , \
             tnames : [  ] , \
+            .. \
         } ,"
     );
 
@@ -348,7 +349,7 @@ fn test_simple_where() {
 
     assert_eq_str!(
         parse_where!({ .. }, then stringify!(),),
-        "{ preds : [  ] , } ,"
+        "{ preds : [  ] , .. } ,"
     );
 
     assert_eq_str!(

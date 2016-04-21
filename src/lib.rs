@@ -231,13 +231,16 @@ fn try_parse_generics<'cx>(
     let (field_tt, tts) = try!(eat_delim_brace(tts));
     let mut field_tts = &field_tt.tts[..];
 
-    if is_just_dotdot(field_tts) {
+    let append_ellipsis = if is_just_dotdot(field_tts) {
         fields.push(GenericField::Constr);
         fields.push(GenericField::Params);
         fields.push(GenericField::LTimes);
         fields.push(GenericField::TNames);
         field_tts = &[];
-    }
+        true
+    } else {
+        false
+    };
 
     while field_tts.len() > 0 {
         let (ident_sp, ident, field_tts_) = try!(eat_ident(field_tts));
@@ -360,6 +363,10 @@ fn try_parse_generics<'cx>(
         }
     }
 
+    if append_ellipsis {
+        ex_fields.push(tok_tt(Token::DotDot));
+    }
+
     ex_tts.push(delim_tt!({} <- ex_fields));
     ex_tts.push(tok_tt(Token::Comma));
 
@@ -403,10 +410,13 @@ fn try_parse_where<'a>(
     let (field_tt, tts) = try!(eat_delim_brace(tts));
     let mut field_tts = &field_tt.tts[..];
 
-    if is_just_dotdot(field_tts) {
+    let append_ellipsis = if is_just_dotdot(field_tts) {
         fields.push(WhereField::Preds);
         field_tts = &[];
-    }
+        true
+    } else {
+        false
+    };
 
     while field_tts.len() > 0 {
         let (ident_sp, ident, field_tts_) = try!(eat_ident(field_tts));
@@ -476,6 +486,10 @@ fn try_parse_where<'a>(
                 ex_fields.push(tok_tt(Token::Comma));
             },
         }
+    }
+
+    if append_ellipsis {
+        ex_fields.push(tok_tt(Token::DotDot));
     }
 
     ex_tts.push(delim_tt!({} <- ex_fields));
