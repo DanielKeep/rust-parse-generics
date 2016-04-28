@@ -80,4 +80,36 @@ fn test_where() {
             ; X
         "#
     );
+
+    aeqiws!(
+        pwts!({..}, where for<> T: 'a; X),
+        r#"
+            { preds : [ for < > T : 'a , ] , .. } ,
+            ; X
+        "#
+    );
+
+    aeqiws!(
+        pwts!({..}, where for<'a> T: 'a; X),
+        r#"
+            { preds : [ for < 'a , > T : 'a , ] , .. } ,
+            ; X
+        "#
+    );
+
+    aeqiws!(
+        pwts!({..}, where for<'a: 'b> T: 'a; X),
+        r#"
+            { preds : [ for < 'a : 'b , > T : 'a , ] , .. } ,
+            ; X
+        "#
+    );
+
+    aeqiws!(
+        pwts!({..}, where 'a: 'b, for<'a: 'b> T: 'a, 'c: 'a + 'b; X),
+        r#"
+            { preds : [ 'a : 'b , for < 'a : 'b , > T : 'a , 'c : 'a + 'b , ] , .. } ,
+            ; X
+        "#
+    );
 }

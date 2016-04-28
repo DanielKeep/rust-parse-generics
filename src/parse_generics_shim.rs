@@ -324,6 +324,26 @@ macro_rules! parse_generics_shim {
     };
 
     (
+        @emit_output
+        { { constr }, $callback:tt },
+        {
+            constr: $constr:tt,
+            ltimes: [$($ltimes:tt)*],
+            tnames: [$($tnames:tt)*],
+        },
+        $($tail:tt)*
+    ) => {
+        parse_generics_shim! {
+            @callback
+            $callback,
+            {
+                constr: $constr,
+            },
+            $($tail)*
+        }
+    };
+
+    (
         @callback
         ($cb_name:ident ! ($($cb_arg:tt)*)),
         $($tail:tt)*
