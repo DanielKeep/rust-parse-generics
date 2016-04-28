@@ -108,6 +108,19 @@ macro_rules! parse_constr {
 
     (
         @parse
+        $prefix:tt, $allow:tt, {$($constr:tt)*},
+        ?Sized $($body:tt)*
+    ) => {
+        parse_constr! {
+            @parse
+            $prefix, $allow,
+            {$($constr)* ?Sized},
+            $($body)*
+        }
+    };
+
+    (
+        @parse
         $prefix:tt, ($_alt:tt, true), {$($constr:tt)*},
         :: $($body:tt)*
     ) => {

@@ -201,6 +201,62 @@ fn test_constr_ty_params() {
             X
         "#
     );
+
+    aeqiws!(
+        pgts!({ .. }, <T: ?Sized> X),
+        r#"
+            {
+                constr : [ T : ? Sized , ] ,
+                params : [ T , ] ,
+                ltimes : [ ] ,
+                tnames : [ T , ] ,
+                ..
+            } ,
+            X
+        "#
+    );
+
+    aeqiws!(
+        pgts!({ .. }, <T: ?Sized + 'a + Copy> X),
+        r#"
+            {
+                constr : [ T : ? Sized + 'a + Copy , ] ,
+                params : [ T , ] ,
+                ltimes : [ ] ,
+                tnames : [ T , ] ,
+                ..
+            } ,
+            X
+        "#
+    );
+
+    aeqiws!(
+        pgts!({ .. }, <T: 'a + ?Sized + Copy> X),
+        r#"
+            {
+                constr : [ T : 'a + ? Sized + Copy , ] ,
+                params : [ T , ] ,
+                ltimes : [ ] ,
+                tnames : [ T , ] ,
+                ..
+            } ,
+            X
+        "#
+    );
+
+    aeqiws!(
+        pgts!({ .. }, <T: 'a + Copy + ?Sized> X),
+        r#"
+            {
+                constr : [ T : 'a + Copy + ? Sized , ] ,
+                params : [ T , ] ,
+                ltimes : [ ] ,
+                tnames : [ T , ] ,
+                ..
+            } ,
+            X
+        "#
+    );
 }
 
 #[test]

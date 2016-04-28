@@ -1,11 +1,3 @@
-/*!
-
-# To-do
-
-* Support `?Sized`
-
-*/
-
 #[macro_export]
 macro_rules! parse_generics_shim {
     (
