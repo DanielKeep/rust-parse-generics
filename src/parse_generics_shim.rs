@@ -8,9 +8,6 @@
 
 #[macro_export]
 macro_rules! parse_generics_shim {
-    (@as_expr $e:expr) => { $e };
-    (@as_item $i:item) => { $i };
-
     (
         @parse_start
         $prefix:tt,
@@ -286,7 +283,7 @@ macro_rules! parse_generics_shim {
         },
         $($tail:tt)*
     ) => {
-        parse_generics_shim! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             {
@@ -310,7 +307,7 @@ macro_rules! parse_generics_shim {
         },
         $($tail:tt)*
     ) => {
-        parse_generics_shim! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             {
@@ -333,7 +330,7 @@ macro_rules! parse_generics_shim {
         },
         $($tail:tt)*
     ) => {
-        parse_generics_shim! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             {
@@ -341,30 +338,6 @@ macro_rules! parse_generics_shim {
             },
             $($tail)*
         }
-    };
-
-    (
-        @callback
-        ($cb_name:ident ! ($($cb_arg:tt)*)),
-        $($tail:tt)*
-    ) => {
-        $cb_name! { $($cb_arg)* $($tail)* }
-    };
-
-    (
-        @callback
-        ($cb_name:ident ! [$($cb_arg:tt)*]),
-        $($tail:tt)*
-    ) => {
-        $cb_name! { $($cb_arg)* $($tail)* }
-    };
-
-    (
-        @callback
-        ($cb_name:ident ! {$($cb_arg:tt)*}),
-        $($tail:tt)*
-    ) => {
-        $cb_name! { $($cb_arg)* $($tail)* }
     };
 
     (

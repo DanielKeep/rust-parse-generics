@@ -153,7 +153,7 @@ macro_rules! parse_where_shim {
         },
         $($tail:tt)*
     ) => {
-        parse_generics_shim! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             {
@@ -170,7 +170,7 @@ macro_rules! parse_where_shim {
         $fields:tt,
         $($tail:tt)*
     ) => {
-        parse_generics_shim! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             $fields,

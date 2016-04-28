@@ -1,3 +1,4 @@
+#[doc(hidden)]
 #[macro_export]
 macro_rules! parse_constr {
     (
@@ -5,7 +6,7 @@ macro_rules! parse_constr {
         { $callback:tt }, $allow:tt, $constr:tt,
         , $($body:tt)*
     ) => {
-        parse_constr! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             $constr,
@@ -18,7 +19,7 @@ macro_rules! parse_constr {
         { $callback:tt }, $allow:tt, $constr:tt,
         > $($body:tt)*
     ) => {
-        parse_constr! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             $constr,
@@ -31,7 +32,7 @@ macro_rules! parse_constr {
         { $callback:tt }, $allow:tt, $constr:tt,
         ; $($body:tt)*
     ) => {
-        parse_constr! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             $constr,
@@ -44,7 +45,7 @@ macro_rules! parse_constr {
         { $callback:tt }, $allow:tt, $constr:tt,
         = $($body:tt)*
     ) => {
-        parse_constr! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             $constr,
@@ -57,7 +58,7 @@ macro_rules! parse_constr {
         { $callback:tt }, $allow:tt, $constr:tt,
         {$($delim:tt)*} $($body:tt)*
     ) => {
-        parse_constr! {
+        parse_generics_shim_util! {
             @callback
             $callback,
             $constr,
@@ -221,30 +222,6 @@ macro_rules! parse_constr {
             $prefix, $stack, {$($constr)* $other},
             $($body)*
         }
-    };
-
-    (
-        @callback
-        ($cb_name:ident ! ($($cb_arg:tt)*)),
-        $($tail:tt)*
-    ) => {
-        $cb_name! { $($cb_arg)* $($tail)* }
-    };
-
-    (
-        @callback
-        ($cb_name:ident ! [$($cb_arg:tt)*]),
-        $($tail:tt)*
-    ) => {
-        $cb_name! { $($cb_arg)* $($tail)* }
-    };
-
-    (
-        @callback
-        ($cb_name:ident ! {$($cb_arg:tt)*}),
-        $($tail:tt)*
-    ) => {
-        $cb_name! { $($cb_arg)* $($tail)* }
     };
 
     (
