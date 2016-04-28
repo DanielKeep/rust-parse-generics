@@ -30,9 +30,9 @@ macro_rules! pgts {
 fn test_simple() {
     aeqiws!(pgts!('a, X), "{ 'a } , , X");
     aeqiws!(pgts!('a> X), "{ 'a } , > X");
-    aeqiws!(pgts!('a (X)), "{ 'a } , ( X )");
     aeqiws!(pgts!('a {X}), "{ 'a } , { X }");
     aeqiws!(pgts!('a; X), "{ 'a } , ; X");
+    aeqiws!(pgts!('a = X), "{ 'a } , = X");
 
     aeqiws!(pgts!(T; X), "{ T } , ; X");
     aeqiws!(pgts!('a + T; X), "{ 'a + T } , ; X");

@@ -42,13 +42,13 @@ macro_rules! parse_constr {
     (
         @parse
         { $callback:tt }, $allow:tt, $constr:tt,
-        ($($delim:tt)*) $($body:tt)*
+        = $($body:tt)*
     ) => {
         parse_constr! {
             @callback
             $callback,
             $constr,
-            ($($delim)*) $($body)*
+            = $($body)*
         }
     };
 
