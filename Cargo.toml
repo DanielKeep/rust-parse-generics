@@ -1,0 +1,6 @@
+[package]
+name = "parse-generics-shim"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[dependencies]
