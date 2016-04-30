@@ -1,0 +1,12 @@
+[package]
+name = "parse-generics-shim"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[features]
+use-parse-generics-poc = ["parse-generics-poc"]
+
+[dependencies.parse-generics-poc]
+version = "0.1.0"
+optional = true
+path = "../parse-generics-poc"
