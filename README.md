@@ -9,10 +9,10 @@ This repository contains several pieces related to the proposed [RFC #1583]:
 
 Examples of using these can be found by looking at each crate's `tests` directory.  In particular, the following for the `parse-macros` crate:
 
-- `derive_clone.rs` - a stable implementation of the built-in `Clone` derivation compiler plugin.
-- `derive_partial_ord.rs` - a stable implementation of the built-in `PartialOrd` derivation compiler plugin.  I was once *assured* this was impossible by a member of the core team.
-- `derive_serialize.rs` - a stable derivation macro for [`serde`]'s `Serialize` trait.  Does not support attributes (*e.g.* custom field names).
-- `reflect.rs` - a *very* minimal compile-time reflection derivation macro.  Progress is blocked on not being able to define generic constants/statics, not on parsing or generation complexity.
+- [`derive_clone.rs`](parse-macros/tests/derive_clone.rs) - a stable implementation of the built-in `Clone` derivation compiler plugin.
+- [`derive_partial_ord.rs`](parse-macros/tests/derive_partial_ord.rs) - a stable implementation of the built-in `PartialOrd` derivation compiler plugin.  I was once *assured* this was impossible by a member of the core team.
+- [`derive_serialize.rs`](parse-macros/tests/derive_serialize.rs) - a stable derivation macro for [`serde`]'s `Serialize` trait.  Does not support attributes (*e.g.* custom field names).
+- [`reflect.rs`](parse-macros/tests/reflect.rs) - a *very* minimal compile-time reflection derivation macro.  Progress is blocked on not being able to define generic constants/statics, not on parsing or generation complexity.
 
 ## Supporting RFC #1583
 
