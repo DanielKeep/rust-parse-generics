@@ -58,13 +58,13 @@ Parses `$body` as an `enum`, invoking the macro `$cb` with the result.  The gene
 $cb! {
     $($cb_arg)*
     enum {
-        attrs: $attrs,
-        vis: $vis,
-        name: $name,
-        generics: $generics,
-        where: $where_,
-        variants: $variants,
-        num_variants: $num_variants,
+        attrs: $attrs:tt,
+        vis: $vis:tt,
+        name: $name:ident,
+        generics: $generics:tt,
+        where: $where_:tt,
+        variants: $variants:tt,
+        num_variants: $num_variants:tt,
     }
 }
 ```
@@ -87,10 +87,10 @@ The expansion contains the following fields:
 
     ```ignore
     generics: {
-        constr: $constr,
-        params: $params,
-        ltimes: $ltimes,
-        tnames: $tnames,
+        constr: $constr:tt,
+        params: $params:tt,
+        ltimes: $ltimes:tt,
+        tnames: $tnames:tt,
     }
     ```
 
@@ -106,7 +106,7 @@ The expansion contains the following fields:
 
     ```ignore
     where: {
-        preds: $preds,
+        preds: $preds:tt,
     }
     ```
 
@@ -120,12 +120,12 @@ Each variant has the following form:
 
 ```ignore
 {
-    ord: ($vord_index, $vord_ident),
-    attrs: $vattrs,
-    kind: $vkind,
-    name: $vname,
-    fields: $vfields,
-    num_fields: $vnum_fields,
+    ord: ($vord_index:tt, $vord_ident:ident),
+    attrs: $vattrs:tt,
+    kind: $vkind:ident,
+    name: $vname:ident,
+    fields: $vfields:tt,
+    num_fields: $vnum_fields:tt,
 }
 ```
 
@@ -147,13 +147,13 @@ Variant fields have the following form:
 
 ```ignore
 {
-    ord: ($ford_index, $ford_ident),
-    attrs: $fattrs,
-    vis: $fvis,
-    ty: $fty,
+    ord: ($ford_index:tt, $ford_ident:ident),
+    attrs: $fattrs:tt,
+    vis: $fvis:tt,
+    ty: $fty:ty,
 
     // **NOTE**: only exists for *record* variant fields:
-    name: $fname,
+    name: $fname:ident,
 }
 ```
 
@@ -290,14 +290,14 @@ Parses `$body` as a `struct`, invoking the macro `$cb` with the result.  The gen
 $cb! {
     $($cb_arg)*
     struct {
-        attrs: $attrs,
-        vis: $vis,
-        name: $name,
-        generics: $generics,
-        where: $where_,
-        kind: $kind,
-        fields: $fields,
-        num_fields: $num_fields,
+        attrs: $attrs:tt,
+        vis: $vis:tt,
+        name: $name:ident,
+        generics: $generics:tt,
+        where: $where_:tt,
+        kind: $kind:ident,
+        fields: $fields:tt,
+        num_fields: $num_fields:tt,
     }
 }
 ```
@@ -320,10 +320,10 @@ The expansion contains the following fields:
 
     ```ignore
     generics: {
-        constr: $constr,
-        params: $params,
-        ltimes: $ltimes,
-        tnames: $tnames,
+        constr: $constr:tt,
+        params: $params:tt,
+        ltimes: $ltimes:tt,
+        tnames: $tnames:tt,
     }
     ```
 
@@ -355,13 +355,13 @@ The expansion contains the following fields:
 
 ```ignore
 {
-    ord: ($ford_index, $ford_ident),
-    attrs: $fattrs,
-    vis: $fvis,
-    ty: $fty,
+    ord: ($ford_index:tt, $ford_ident:ident),
+    attrs: $fattrs:tt,
+    vis: $fvis:tt,
+    ty: $fty:ty,
 
     // **NOTE**: only exists for *record* `struct` fields:
-    name: $fname,
+    name: $fname:ident,
 }
 ```
 
