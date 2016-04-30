@@ -694,31 +694,43 @@ fn path_to_tts(path: &ast::Path, tts: &mut Vec<TokenTree>) {
             tts.push(tok_tt(Token::ModSep));
         }
         tts.push(ident_tt(seg.identifier));
+
+        // Use separating commas, since the shim has to blind-parse paths,
+        // and can't really insert terminating commas.
+        macro_rules! maybe_comma {
+            ($need_comma:ident) => {
+                if $need_comma { tts.push(tok_tt(Token::Comma)); }
+                $need_comma = true;
+            };
+        }
+
         match seg.parameters {
             PP::AngleBracketed(ref data) if !seg.parameters.is_empty() => {
+                let mut need_comma = false;
                 tts.push(tok_tt(Token::Lt));
                 for lifetime in &data.lifetimes {
+                    maybe_comma!(need_comma);
                     tts.push(ltime_tt(*lifetime));
-                    tts.push(tok_tt(Token::Comma));
                 }
                 for ty in &data.types {
+                    maybe_comma!(need_comma);
                     tts.push(nt_ty_tt(ty.clone()));
-                    tts.push(tok_tt(Token::Comma));
                 }
                 for binding in &data.bindings {
+                    maybe_comma!(need_comma);
                     tts.push(ident_tt(binding.ident));
                     tts.push(tok_tt(Token::Eq));
                     tts.push(nt_ty_tt(binding.ty.clone()));
-                    tts.push(tok_tt(Token::Comma));
                 }
                 tts.push(tok_tt(Token::Gt));
             },
             PP::AngleBracketed(_) => (),
             PP::Parenthesized(ref data) => {
+                let mut need_comma = false;
                 tts.push(tok_tt(Token::OpenDelim(DelimToken::Paren)));
                 for input in &data.inputs {
+                    maybe_comma!(need_comma);
                     tts.push(nt_ty_tt(input.clone()));
-                    tts.push(tok_tt(Token::Comma));
                 }
                 tts.push(tok_tt(Token::CloseDelim(DelimToken::Paren)));
                 if let Some(ref output) = data.output {
@@ -741,13 +753,11 @@ fn pred_to_tts(pred: &ast::WherePredicate, tts: &mut Vec<TokenTree>) {
             if wbp.bound_lifetimes.len() > 0 {
                 tts.push(ident_str_tt("for"));
                 tts.push(tok_tt(Token::Lt));
-                let mut need_comma = false;
                 for ltd in &wbp.bound_lifetimes {
-                    if need_comma {
-                        tts.push(tok_tt(Token::Comma));
-                    }
-                    need_comma = true;
+                    // Use terminating commas here, as it's easier for the shim
+                    // to construct.
                     ltime_def_to_tts(ltd, tts);
+                    tts.push(tok_tt(Token::Comma));
                 }
                 tts.push(tok_tt(Token::Gt));
             }
