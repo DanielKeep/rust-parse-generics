@@ -11,6 +11,12 @@ Because these macros are implemented using `macro_rules!`, they have the followi
 - Only a subset of the full output formats are supported.
 - They are significantly less efficient, and consume a non-trivial amount of the recursion limit.
 
+# Table of Contents
+
+- [`parse_generics_shim!`](#parse_generics_shim)
+- [`parse_where_shim!`](#parse_where_shim)
+- [Supporting `parse-generics-poc`](#supporting-parse-generics-poc)
+
 [RFC #1583]: https://github.com/rust-lang/rfcs/pull/1583
 
 ## `parse_generics_shim!`
@@ -232,7 +238,7 @@ stringify!(
 # */ }
 ```
 
-## `parse_where!`
+## `parse_where_shim!`
 
 ```ignore
 macro_rules! parse_where_shim {
@@ -389,6 +395,60 @@ stringify!(
 )
 # */ }
 ```
+
+## Supporting `parse-generics-poc`
+
+If you wish to enable support for the full `parse_generics!` and `parse_where!` macros *instead* of the shim implementations, you need to create a feature which will enable the POC macros.  This can be done by adding the following to your `Cargo.toml` manifest:
+
+```toml
+[features]
+use-parse-generics-poc = [
+    "parse-generics-poc",
+    "parse-generics-shim/use-parse-generics-poc",
+]
+
+[dependencies]
+parse-generics-poc = { version = "0.1.0", optional = true }
+parse-generics-shim = "0.1.0"
+```
+
+You should also pass the following information on to your users (or direct them here):
+
+### Using `parse-generics-poc`
+
+To activate `parse-generics-poc` support in the `whizzo` crate, you must:
+
+1. Enable the `use-parse-generics-poc` feature in your crate.  This is best done using a forwarding feature in your `Cargo.toml` so that your code is not unavoidably dependant on a nightly compiler:
+
+    ```toml
+    [features]
+    use-parse-generics-poc = [
+        "parse-generics-poc",
+        "whizzo/use-parse-generics-poc"
+    ]
+    ```
+
+2. Depend on both the relevant macro crates.  Because compiler plugins and macros can't be re-exported, this is sadly unavoidable.
+
+    ```toml
+    [dependencies]
+    parse-generics-poc = { version = "0.1.0", optional = true }
+    parse-generics-shim = "0.1.0"
+    ```
+
+3. You have to use a nightly compiler compatible with `parse-generics-poc`.  The documentation for `parse-generics-poc` should specify *which* nightly it is known to be compatible with.  If you are using `rustup`, you can configure your crate to use the appropriate compiler using the following (replacing the date shown with the one listed in the `parse-generics-poc` documentation):
+
+    ```sh
+    rustup override add nightly-2016-04-06
+    ```
+
+4. You must add the following attributes to the top of your crate's root module:
+
+    ```rust
+    #![cfg_attr(feature="parse-generics-poc", feature(plugin))]
+    #![cfg_attr(feature="parse-generics-poc", plugin(parse_generics_poc))]
+    #[macro_use] extern crate parse_generics_shim;
+    ```
 */
 #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
 #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
