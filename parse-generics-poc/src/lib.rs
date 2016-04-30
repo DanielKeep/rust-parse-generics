@@ -7,6 +7,34 @@ Licensed under the MIT license (see LICENSE or <http://opensource.org
 files in the project carrying such notice may not be copied, modified,
 or distributed except according to those terms.
 */
+/*!
+This crate contains a proof-of-concept implementation for the `parse-generics-and-where` RFC.  It requires the `rustc` nightly from 2016-04-06.
+
+As this is a proof-of-concept compiler plugin, you should avoid using this crate *directly*.  Instead, you should use the stable `parse-generics-shim` crate if possible.  The macros in this plugin can be used by enabling the shim crate's `use-parse-generics-poc` feature.
+
+<style type="text/css">
+.link-block { font-family: "Fira Sans"; }
+.link-block > p { display: inline-block; }
+.link-block > p > strong { font-weight: 500; margin-right: 1em; }
+.link-block > ul { display: inline-block; padding: 0; list-style: none; }
+.link-block > ul > li {
+  font-size: 0.8em;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 0.3em;
+  display: inline-block;
+}
+</style>
+<span></span><div class="link-block">
+
+**Links**
+
+* [Latest Docs](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_poc/index.html)
+* [Repository](https://github.com/DanielKeep/rust-parse-generics)
+
+<span></span></div>
+
+*/
 #![feature(plugin_registrar, rustc_private)]
 
 extern crate syntax;

@@ -14,6 +14,11 @@ Examples of using these can be found by looking at each crate's `tests` director
 - [`derive_serialize.rs`](parse-macros/tests/derive_serialize.rs) - a stable derivation macro for [`serde`]'s `Serialize` trait.  Does not support attributes (*e.g.* custom field names).
 - [`reflect.rs`](parse-macros/tests/reflect.rs) - a *very* minimal compile-time reflection derivation macro.  Progress is blocked on not being able to define generic constants/statics, not on parsing or generation complexity.
 
+**Links**
+
+* Latest Docs ([`parse-generics-poc`](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_poc/index.html), [`parse-generics-shim`](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_shim/index.html), [`parse-macros`](https://danielkeep.github.io/rust-parse-generics/doc/parse_macros/index.html))
+* [Repository](https://github.com/DanielKeep/rust-parse-generics)
+
 ## Supporting RFC #1583
 
 The core team currently feels uneasy about accepting [RFC #1583], due to its complexity and the lack of demonstrable support for being able to correctly process generics and `where` clauses in macros.

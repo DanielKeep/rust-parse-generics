@@ -1,0 +1,14 @@
+[package]
+name = "doc-pkg"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[dependencies]
+parse-generics-poc = { path = "../parse-generics-poc" }
+parse-generics-shim = { path = "../parse-generics-shim" }
+parse-macros = { path = "../parse-macros" }
+
+[lib]
+name = "doc"
+path = "src.rs"
+doc = false

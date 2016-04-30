@@ -12,6 +12,28 @@ This crate provides high-level macros for parsing various Rust constructs.
 
 Specifically, these macros are concerned with taking Rust source constructs and rewriting them into a format which is more easily consumable by `macro_rules!` macros.
 
+<style type="text/css">
+.link-block { font-family: "Fira Sans"; }
+.link-block > p { display: inline-block; }
+.link-block > p > strong { font-weight: 500; margin-right: 1em; }
+.link-block > ul { display: inline-block; padding: 0; list-style: none; }
+.link-block > ul > li {
+  font-size: 0.8em;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 0.3em;
+  display: inline-block;
+}
+</style>
+<span></span><div class="link-block">
+
+**Links**
+
+* [Latest Docs](https://danielkeep.github.io/rust-parse-generics/doc/parse_macros/index.html)
+* [Repository](https://github.com/DanielKeep/rust-parse-generics)
+
+<span></span></div>
+
 ## Table of Contents
 
 - [`parse_enum!`](#parse_enum)
