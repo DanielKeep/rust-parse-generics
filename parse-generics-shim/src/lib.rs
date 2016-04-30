@@ -475,7 +475,7 @@ To activate `parse-generics-poc` support in the `whizzo` crate, you must:
 
 4. You must add the following attributes to the top of your crate's root module:
 
-    ```rust
+    ```ignore
     #![cfg_attr(feature="parse-generics-poc", feature(plugin))]
     #![cfg_attr(feature="parse-generics-poc", plugin(parse_generics_poc))]
     #[macro_use] extern crate parse_generics_shim;
