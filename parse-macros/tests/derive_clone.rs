@@ -145,8 +145,8 @@ macro_rules! Clone_mac {
                     ord: $_ford:tt,
                     attrs: $_fattrs:tt,
                     vis: $_fvis:tt,
-                    name: $fname:ident,
                     ty: $_fty:ty,
+                    name: $fname:ident,
                 },
             )*],
             $($_struct_tail:tt)*
@@ -174,7 +174,7 @@ macro_rules! Clone_mac {
             attrs: $_attrs:tt,
             kind: unitary,
             name: $vname:ident,
-            fields: (),
+            fields: [],
             num_fields: 0,
         }
     ) => {
@@ -189,7 +189,7 @@ macro_rules! Clone_mac {
             attrs: $_attrs:tt,
             kind: unitary,
             name: $vname:ident,
-            fields: (),
+            fields: [],
             num_fields: 0,
         }
     ) => {

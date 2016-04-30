@@ -93,7 +93,7 @@ macro_rules! Serialize {
             attrs: $_vattrs:tt,
             kind: unitary,
             name: $vname:ident,
-            fields: (),
+            fields: [],
             num_fields: 0,
         }
     ) => {
@@ -109,7 +109,7 @@ macro_rules! Serialize {
             attrs: $_vattrs:tt,
             kind: unitary,
             name: $vname:ident,
-            fields: (),
+            fields: [],
             num_fields: 0,
         }
     ) => {
@@ -319,8 +319,8 @@ macro_rules! Serialize {
                         ord: ($ford:tt, $fident:ident),
                         attrs: $_fattrs:tt,
                         vis: $_fvis:tt,
-                        name: $fname:ident,
                         ty: $_fty:ty,
+                        name: $fname:ident,
                     },
                 )+
             ],

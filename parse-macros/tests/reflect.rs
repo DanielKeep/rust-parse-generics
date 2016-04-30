@@ -63,8 +63,8 @@ macro_rules! Reflect {
                     ord: $_ord:tt,
                     attrs: $_attrs:tt,
                     vis: $vis:tt,
-                    name: $name:ident,
                     ty: $ty:ty,
+                    name: $name:ident,
                     $(_field_tail:tt)*
                 },
             )*

@@ -105,7 +105,7 @@ macro_rules! parse_enum {
             @parse_variants
             $prefix2,
             $variants,
-            [$($attrs)* $($attr)*],
+            [$($attrs)* #[$($attr)*]],
             { $($tail)* },
             $ord, $ord_ident
         }
@@ -131,7 +131,7 @@ macro_rules! parse_enum {
                         attrs: $attrs,
                         kind: unitary,
                         name: $vname,
-                        fields: (),
+                        fields: [],
                         num_fields: 0,
                     },
                 ],
