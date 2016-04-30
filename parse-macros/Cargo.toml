@@ -1,0 +1,28 @@
+[package]
+name = "parse-macros"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+build = "build.rs"
+
+[features]
+use-parse-generics-poc = [
+    "parse-generics-poc",
+    "parse-generics-shim/use-parse-generics-poc",
+]
+
+[dependencies]
+custom_derive = "0.1.4"
+parse-generics-shim = { version = "0.1.0", path = "../parse-generics-shim" }
+
+[dependencies.parse-generics-poc]
+version = "0.1.0"
+optional = true
+path = "../parse-generics-poc"
+
+[build-dependencies]
+rustc_version = "0.1.7"
+
+[dev-dependencies]
+serde = "0.6.11"
+serde_json = "0.6.0"
