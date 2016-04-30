@@ -246,7 +246,7 @@ fn test_simple() {
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32)> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
-                + for < 'c , 'd : 'e > Fn ( &'c i32 , ) , ] , \
+                + for < 'c , 'd : 'e > Fn ( &'c i32 ) , ] , \
             params : [ T , ] , \
             ltimes : [  ] , \
             tnames : [ T , ] , \
@@ -258,7 +258,7 @@ fn test_simple() {
             <T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32) -> &'d ()> X),
         "{ \
             constr : [ T : 'a + 'b + Copy + Clone \
-                + for < 'c , 'd : 'e > Fn ( &'c i32 , ) -> &'d () , ] , \
+                + for < 'c , 'd : 'e > Fn ( &'c i32 ) -> &'d () , ] , \
             params : [ T , ] , \
             ltimes : [  ] , \
             tnames : [ T , ] , \
@@ -270,7 +270,7 @@ fn test_simple() {
             <'a, 'b, 'd, T: 'a + 'b + Copy + Clone + for<'c, 'd: 'e> Fn(&'c i32) -> &'d ()> X),
         "{ \
             constr : [ 'a , 'b , 'd , T : 'a + 'b + Copy + Clone \
-                + for < 'c , 'd : 'e > Fn ( &'c i32 , ) -> &'d () , ] , \
+                + for < 'c , 'd : 'e > Fn ( &'c i32 ) -> &'d () , ] , \
             params : [ 'a , 'b , 'd , T , ] , \
             ltimes : [ 'a , 'b , 'd , ] , \
             tnames : [ T , ] , \
@@ -292,7 +292,7 @@ fn test_simple() {
         parse_generics!({ constr, params, ltimes, tnames }, then stringify!(),
             <T: ::std::convert::Into<String>> X),
         "{ \
-            constr : [ T : :: std :: convert :: Into < String , > , ] , \
+            constr : [ T : :: std :: convert :: Into < String > , ] , \
             params : [ T , ] , \
             ltimes : [  ] , \
             tnames : [ T , ] , \
@@ -352,13 +352,18 @@ fn test_simple() {
 #[test]
 fn test_simple_where() {
     assert_eq_str!(
+        parse_where!({ clause, preds }, then stringify!(),),
+        "{ clause : [  ] , preds : [  ] , } ,"
+    );
+
+    assert_eq_str!(
         parse_where!({ preds }, then stringify!(),),
         "{ preds : [  ] , } ,"
     );
 
     assert_eq_str!(
         parse_where!({ .. }, then stringify!(),),
-        "{ preds : [  ] , .. } ,"
+        "{ clause : [  ] , preds : [  ] , .. } ,"
     );
 
     assert_eq_str!(
@@ -369,6 +374,11 @@ fn test_simple_where() {
     assert_eq_str!(
         parse_where!({ preds }, then stringify!(), {} X),
         "{ preds : [  ] , } , {  } X"
+    );
+
+    assert_eq_str!(
+        parse_where!({ clause }, then stringify!(), where T: Copy {X}),
+        "{ clause : [ where T : Copy , ] , } , { X }"
     );
 
     assert_eq_str!(
@@ -388,7 +398,7 @@ fn test_simple_where() {
 
     assert_eq_str!(
         parse_where!({ preds }, then stringify!(), where for<'a> &'a str: Into<T> {X}),
-        "{ preds : [ for < 'a > &'a str : Into < T , > , ] , } , { X }"
+        "{ preds : [ for < 'a , > &'a str : Into < T > , ] , } , { X }"
     );
 
     assert_eq_str!(
@@ -396,7 +406,7 @@ fn test_simple_where() {
             where for<'a: 'b, 'b> &'a str: Into<T+'b> {X}),
         "{ \
             preds : [ \
-                for < 'a : 'b , 'b > &'a str : Into < T+ 'b , > , \
+                for < 'a : 'b , 'b , > &'a str : Into < T+ 'b > , \
             ] , \
         } , { X }"
     );
@@ -406,7 +416,7 @@ fn test_simple_where() {
             where &'a str: Into<T+'b>, 'a: 'b, 'b: 'c + 'd {X}),
         "{ \
             preds : [ \
-                &'a str : Into < T+ 'b , > , \
+                &'a str : Into < T+ 'b > , \
                 'a : 'b , \
                 'b : 'c + 'd , \
             ] , \

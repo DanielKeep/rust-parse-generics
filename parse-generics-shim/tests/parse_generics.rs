@@ -386,6 +386,35 @@ fn test_constr_lt_params() {
             X
         "#
     );
+
+    aeqiws!(
+        pgts!({ .. }, <T: ?Sized + Clone + Copy + for<'a> From<&'a str> > X),
+        if cfg!(feature="parse-generics-poc") {
+            r#"
+                {
+                    constr : [ T : ? Sized + Clone + Copy
+                        + for < 'a > From < &'a str > , ] ,
+                    params : [ T , ] ,
+                    ltimes : [ ] ,
+                    tnames : [ T , ] ,
+                    ..
+                } ,
+                X
+            "#
+        } else {
+            r#"
+                {
+                    constr : [ T : ? Sized + Clone + Copy
+                        + for < 'a > From < & 'a str > , ] ,
+                    params : [ T , ] ,
+                    ltimes : [ ] ,
+                    tnames : [ T , ] ,
+                    ..
+                } ,
+                X
+            "#
+        }
+    );
 }
 
 #[test]

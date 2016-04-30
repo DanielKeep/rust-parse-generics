@@ -434,6 +434,7 @@ fn try_parse_generics<'cx>(
 
 #[derive(Eq, PartialEq)]
 enum WhereField {
+    Clause,
     Preds,
 }
 
@@ -448,6 +449,7 @@ fn try_parse_where<'a>(
     let mut field_tts = &field_tt.tts[..];
 
     let append_ellipsis = if is_just_dotdot(field_tts) {
+        fields.push(WhereField::Clause);
         fields.push(WhereField::Preds);
         field_tts = &[];
         true
@@ -468,6 +470,7 @@ fn try_parse_where<'a>(
         }
 
         match ident {
+            "clause" => handle_field!(clause, Clause),
             "preds" => handle_field!(preds, Preds),
             _ => {
                 if let Ok(field_tts_) = can_skip_token(Token::Question, field_tts) {
@@ -509,13 +512,31 @@ fn try_parse_where<'a>(
         preds.push(tok_tt(Token::Comma));
     }
 
+    let clause = {
+        if preds.len() != 0 {
+            let mut clause = Vec::with_capacity(preds.len() + 1);
+            clause.push(ident_str_tt("where"));
+            clause.extend(preds.iter().cloned());
+            clause
+        } else {
+            vec![]
+        }
+    };
+
     let mut ex_tts = callback_args.tts.clone();
 
     let mut ex_fields = vec![];
+    let mut clause = Some(clause);
     let mut preds = Some(preds);
 
     for field in fields {
         match field {
+            WhereField::Clause => {
+                ex_fields.push(ident_str_tt("clause"));
+                ex_fields.push(tok_tt(Token::Colon));
+                ex_fields.push(delim_tt!([] <- clause.take().unwrap()));
+                ex_fields.push(tok_tt(Token::Comma));
+            },
             WhereField::Preds => {
                 ex_fields.push(ident_str_tt("preds"));
                 ex_fields.push(tok_tt(Token::Colon));

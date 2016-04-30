@@ -102,15 +102,18 @@ The expansion contains the following fields:
 
     - `$tnames`: a `[ .. ]`-delimited, comma-terminated list of generic type parameters.  *e.g.* `[T, U,]`.
 
-- `$where_`: the `{ .. }`-delimited output of `parse_where_shim!` for the `enum`, containing the `preds` field:
+- `$where_`: the `{ .. }`-delimited output of `parse_where_shim!` for the `enum`, containing the `clause`, and `preds` fields:
 
     ```ignore
     where: {
+        clause: $clause:tt,
         preds: $preds:tt,
     }
     ```
 
-    - `$preds`: a `[ .. ]`-delimited, comma-separated list of clause predicates.  *e.g.* `[ for<'a> T: Fn(&'a i32), ]`.
+    - `$clause`: a `[ .. ]`-delimited, comma-terminated clause, including the `where` keyword.  If the clause is empty, the `where` keyword is omitted, and the brackets are empty.  *e.g.* `[]`, `[ where for<'a> T: Fn(&'a i32), ]`.
+
+    - `$preds`: a `[ .. ]`-delimited, comma-terminated list of clause predicates.  *e.g.* `[]`, `[ for<'a> T: Fn(&'a i32), ]`.
 
 - `$variants`: a `[ .. ]`-delimited, comma-terminated list of variants (described below).
 
@@ -208,6 +211,7 @@ stringify!(
             tnames: [T,],
         },
         where: {
+            clause: [],
             preds: [],
         },
         variants: [
@@ -416,6 +420,7 @@ stringify!(
             tnames: [Ch,],
         },
         where: {
+            clause: [],
             preds: [],
         },
         kind: record,

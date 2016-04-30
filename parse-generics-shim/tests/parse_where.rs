@@ -44,7 +44,15 @@ fn test_no_where() {
     aeqiws!(
         pwts!({..}, X),
         r#"
-            { preds : [ ] , .. } ,
+            { clause : [ ] , preds : [ ] , .. } ,
+            X
+        "#
+    );
+
+    aeqiws!(
+        pwts!({ clause, preds }, X),
+        r#"
+            { clause : [ ] , preds : [ ] , } ,
             X
         "#
     );
@@ -63,7 +71,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where 'a: 'b; X),
         r#"
-            { preds : [ 'a : 'b , ] , .. } ,
+            {
+                clause : [ where 'a : 'b , ] ,
+                preds : [ 'a : 'b , ] ,
+                ..
+            } ,
             ; X
         "#
     );
@@ -71,7 +83,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where T: 'a + U; X),
         r#"
-            { preds : [ T : 'a + U , ] , .. } ,
+            {
+                clause : [ where T : 'a + U , ] ,
+                preds : [ T : 'a + U , ] ,
+                ..
+            } ,
             ; X
         "#
     );
@@ -79,7 +95,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where 'a: 'b, T: 'a + U; X),
         r#"
-            { preds : [ 'a : 'b , T : 'a + U , ] , .. } ,
+            {
+                clause : [ where 'a : 'b , T : 'a + U , ] ,
+                preds : [ 'a : 'b , T : 'a + U , ] ,
+                ..
+            } ,
             ; X
         "#
     );
@@ -87,7 +107,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where 'a: 'b, T: 'a + U, {} X),
         r#"
-            { preds : [ 'a : 'b , T : 'a + U , ] , .. } ,
+            {
+                clause : [ where 'a : 'b , T : 'a + U , ] ,
+                preds : [ 'a : 'b , T : 'a + U , ] ,
+                ..
+            } ,
             { } X
         "#
     );
@@ -95,7 +119,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where for<> T: 'a; X),
         r#"
-            { preds : [ T : 'a , ] , .. } ,
+            {
+                clause : [ where T : 'a , ] ,
+                preds : [ T : 'a , ] ,
+                ..
+            } ,
             ; X
         "#
     );
@@ -103,7 +131,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where for<'a> T: 'a; X),
         r#"
-            { preds : [ for < 'a , > T : 'a , ] , .. } ,
+            {
+                clause : [ where for < 'a , > T : 'a , ] ,
+                preds : [ for < 'a , > T : 'a , ] ,
+                ..
+            } ,
             ; X
         "#
     );
@@ -111,7 +143,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where for<'a: 'b> T: 'a; X),
         r#"
-            { preds : [ for < 'a : 'b , > T : 'a , ] , .. } ,
+            {
+                clause : [ where for < 'a : 'b , > T : 'a , ] ,
+                preds : [ for < 'a : 'b , > T : 'a , ] ,
+                ..
+            } ,
             ; X
         "#
     );
@@ -119,7 +155,11 @@ fn test_where() {
     aeqiws!(
         pwts!({..}, where 'a: 'b, for<'a: 'b> T: 'a, 'c: 'a + 'b; X),
         r#"
-            { preds : [ 'a : 'b , for < 'a : 'b , > T : 'a , 'c : 'a + 'b , ] , .. } ,
+            {
+                clause : [ where 'a : 'b , for < 'a : 'b , > T : 'a , 'c : 'a + 'b , ] ,
+                preds : [ 'a : 'b , for < 'a : 'b , > T : 'a , 'c : 'a + 'b , ] ,
+                ..
+            } ,
             ; X
         "#
     );

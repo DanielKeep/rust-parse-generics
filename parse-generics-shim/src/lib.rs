@@ -303,10 +303,12 @@ $callback_name! {
 
 `$fields` indicates which pieces of information you want in the expansion.  The available fields are:
 
-- `preds` - comma-terminated list of predicates.
+- `clause` - comma-terminated clause *including* the `where` keyword.  If there is no clause, the `where` keyword is omitted.  Use this if you simply wish to pass a `where` clause through unmodified.
+- `preds` - comma-terminated list of predicates.  Use this if you wish to modify or append to the predicates.
 
 The shim *only* supports the following combinations:
 
+- `{ clause, preds }`
 - `{ preds }`
 - `{ .. }`
 
@@ -319,7 +321,7 @@ macro_rules! match_output {
     (
         {
             // Match the fields you care about.
-            preds: [ $($preds:tt)* ],
+            clause: [ $($clause:tt)* ],
 
             // Ignore the rest; *never* explicitly match `..`!
             $($_fields:tt)*
@@ -390,6 +392,7 @@ stringify!(
 # */
 # ).replace(char::is_whitespace, "") , "
     output: {
+        clause: [ where 'a: 'b, T: 'a + Copy, for<'c,> U: Foo<'c>, ],
         preds: [ 'a: 'b, T: 'a + Copy, for<'c,> U: Foo<'c>, ],
         ..
     },

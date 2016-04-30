@@ -37,6 +37,7 @@ macro_rules! Reflect {
                 tnames: [ $($tnames:ident,)* ],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [ $($preds:tt)* ],
             },
             kind: $_kind:tt,

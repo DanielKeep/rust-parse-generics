@@ -184,7 +184,7 @@ macro_rules! parse_where_shim {
         @emit_output
         { { .. }, $callback:tt },
         {
-            preds: $preds:tt,
+            preds: [],
         },
         $($tail:tt)*
     ) => {
@@ -192,8 +192,67 @@ macro_rules! parse_where_shim {
             @callback
             $callback,
             {
-                preds: $preds,
+                clause: [],
+                preds: [],
                 ..
+            },
+            $($tail)*
+        }
+    };
+
+    (
+        @emit_output
+        { { .. }, $callback:tt },
+        {
+            preds: [$($preds:tt)*],
+        },
+        $($tail:tt)*
+    ) => {
+        parse_generics_shim_util! {
+            @callback
+            $callback,
+            {
+                clause: [where $($preds)*],
+                preds: [$($preds)*],
+                ..
+            },
+            $($tail)*
+        }
+    };
+
+    (
+        @emit_output
+        { { clause, preds }, $callback:tt },
+        {
+            preds: [],
+        },
+        $($tail:tt)*
+    ) => {
+        parse_generics_shim_util! {
+            @callback
+            $callback,
+            {
+                clause: [],
+                preds: [],
+            },
+            $($tail)*
+        }
+    };
+
+    (
+        @emit_output
+        { { clause, preds }, $callback:tt },
+        {
+            preds: [$($preds:tt)*],
+        },
+        $($tail:tt)*
+    ) => {
+        parse_generics_shim_util! {
+            @callback
+            $callback,
+            {
+                clause: [where $($preds)*],
+                preds: [$($preds)*],
             },
             $($tail)*
         }

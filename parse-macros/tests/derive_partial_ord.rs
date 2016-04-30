@@ -45,6 +45,7 @@ macro_rules! PartialOrd_mac {
                 tnames: [$($tnames:ident,)*],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [$($preds:tt)*],
             },
             variants: [],
@@ -76,6 +77,7 @@ macro_rules! PartialOrd_mac {
                 tnames: [$($tnames:ident,)*],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [$($preds:tt)*],
             },
             variants: [$var:tt,],
@@ -109,6 +111,7 @@ macro_rules! PartialOrd_mac {
                 tnames: [$($tnames:ident,)*],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [$($preds:tt)*],
             },
             variants: [$($vars:tt,)*],
@@ -152,6 +155,7 @@ macro_rules! PartialOrd_mac {
                 tnames: [$($tnames:ident,)*],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [$($preds:tt)*],
             },
             kind: unitary,
@@ -184,6 +188,7 @@ macro_rules! PartialOrd_mac {
                 tnames: [$($tnames:ident,)*],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [$($preds:tt)*],
             },
             kind: tuple,
@@ -231,6 +236,7 @@ macro_rules! PartialOrd_mac {
                 tnames: [$($tnames:ident,)*],
             },
             where: {
+                clause: $_clause:tt,
                 preds: [$($preds:tt)*],
             },
             kind: record,

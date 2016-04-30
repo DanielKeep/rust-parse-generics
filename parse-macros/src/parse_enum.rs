@@ -45,7 +45,7 @@ macro_rules! parse_enum {
         $($tail:tt)*
     ) => {
         parse_where_shim! {
-            { preds }, then parse_enum! {
+            { clause, preds }, then parse_enum! {
                 @with_where
                 $prefix,
                 $generics,
@@ -58,12 +58,12 @@ macro_rules! parse_enum {
         @with_where
         $prefix:tt,
         $generics:tt,
-        $preds:tt,
+        $where_:tt,
         { $($body:tt)* }
     ) => {
         parse_enum! {
             @parse_variants
-            ($prefix, $generics, $preds),
+            ($prefix, $generics, $where_),
             [],
             [],
             { $($body)*, },
@@ -81,7 +81,7 @@ macro_rules! parse_enum {
                 $name:ident
             ),
             $generics:tt,
-            $preds:tt
+            $where_:tt
         ),
         $variants:tt,
         $_attrs:tt,
@@ -95,7 +95,7 @@ macro_rules! parse_enum {
                 vis: $vis,
                 name: $name,
                 generics: $generics,
-                where: $preds,
+                where: $where_,
                 variants: $variants,
                 num_variants: $ord,
             }

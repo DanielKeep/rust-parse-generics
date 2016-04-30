@@ -45,7 +45,7 @@ macro_rules! parse_struct {
         ($($body:tt)*) $($tail:tt)*
     ) => {
         parse_where_shim! {
-            { preds }, then parse_struct! {
+            { clause, preds }, then parse_struct! {
                 @with_where
                 $prefix, $generics,
             },
@@ -60,7 +60,7 @@ macro_rules! parse_struct {
         $($tail:tt)*
     ) => {
         parse_where_shim! {
-            { preds }, then parse_struct! {
+            { clause, preds }, then parse_struct! {
                 @with_where
                 $prefix, $generics,
             },
@@ -72,7 +72,7 @@ macro_rules! parse_struct {
         @with_where
         ($cb:tt, $attrs:tt, $vis:tt, $name:ident),
         $generics:tt,
-        $preds:tt,
+        $where_:tt,
         ;
     ) => {
         parse_macros_util! {
@@ -82,7 +82,7 @@ macro_rules! parse_struct {
                 vis: $vis,
                 name: $name,
                 generics: $generics,
-                where: $preds,
+                where: $where_,
                 kind: unitary,
                 fields: [],
                 num_fields: 0,
@@ -94,12 +94,12 @@ macro_rules! parse_struct {
         @with_where
         $prefix:tt,
         $generics:tt,
-        $preds:tt,
+        $where_:tt,
         ; ($($body:tt)*)
     ) => {
         parse_struct! {
             @parse_fields
-            ($prefix, $generics, $preds),
+            ($prefix, $generics, $where_),
             [],
             [],
             ($($body)*,),
@@ -111,12 +111,12 @@ macro_rules! parse_struct {
         @with_where
         $prefix:tt,
         $generics:tt,
-        $preds:tt,
+        $where_:tt,
         {$($body:tt)*}
     ) => {
         parse_struct! {
             @parse_fields
-            ($prefix, $generics, $preds),
+            ($prefix, $generics, $where_),
             [],
             [],
             {$($body)*,},
@@ -134,7 +134,7 @@ macro_rules! parse_struct {
                 $name:ident
             ),
             $generics:tt,
-            $preds:tt
+            $where_:tt
         ),
         $fields:tt,
         $_attrs:tt,
@@ -148,7 +148,7 @@ macro_rules! parse_struct {
                 vis: $vis,
                 name: $name,
                 generics: $generics,
-                where: $preds,
+                where: $where_,
                 kind: tuple,
                 fields: $fields,
                 num_fields: $ord,
@@ -242,7 +242,7 @@ macro_rules! parse_struct {
                 $name:ident
             ),
             $generics:tt,
-            $preds:tt
+            $where_:tt
         ),
         $fields:tt,
         $_attrs:tt,
@@ -256,7 +256,7 @@ macro_rules! parse_struct {
                 vis: $vis,
                 name: $name,
                 generics: $generics,
-                where: $preds,
+                where: $where_,
                 kind: record,
                 fields: $fields,
                 num_fields: $ord,

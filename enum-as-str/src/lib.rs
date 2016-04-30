@@ -32,7 +32,8 @@ macro_rules! enum_as_str {
                 $($_generics:tt)*
             },
             where: {
-                preds: [ $($preds:tt)* ],
+                clause: [$($clause:tt)*],
+                preds: $_preds:tt,
             },
             variants: [
                 $(
@@ -51,7 +52,7 @@ macro_rules! enum_as_str {
     ) => {
         enum_as_str! {
             @as_item
-            impl<$($constr)*> $name<$($params)*> {
+            impl<$($constr)*> $name<$($params)*> $($clause)* {
                 pub fn $fn_name(&self) -> &'static str {
                     match *self {
                         $(
