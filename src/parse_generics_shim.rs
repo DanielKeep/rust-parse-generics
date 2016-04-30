@@ -1,3 +1,13 @@
+#[cfg(feature="use-parse-generics-poc")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! parse_generics_shim {
+    ($($body:tt)*) => {
+        parse_generics! { $($body)* }
+    };
+}
+
+#[cfg(not(feature="use-parse-generics-poc"))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! parse_generics_shim {

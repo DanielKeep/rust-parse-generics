@@ -88,6 +88,8 @@ macro_rules! match_output {
 The following show how the various invocation forms affect the output:
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -115,6 +117,8 @@ stringify!(
 ```
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -139,6 +143,8 @@ stringify!(
 ```
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -169,6 +175,8 @@ stringify!(
 The input does not *have* to start with a generic parameter list.  Note that both of the invocations below expand to the same result:
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -196,6 +204,8 @@ stringify!(
 ```
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -292,6 +302,8 @@ macro_rules! match_output {
 The following show how the various invocation forms affect the output:
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -302,7 +314,7 @@ parse_where_shim! {
         'a: 'b,
         T: 'a + Copy,
         for<'c> U: Foo<'c>,
-    ; X
+    { struct fields... }
 }
 
 // Expands to:
@@ -313,13 +325,15 @@ stringify!(
     output: {
         preds: [ 'a: 'b, T: 'a + Copy, for<'c,> U: Foo<'c>, ],
     },
-    ; X
+    { struct fields... }
 # ".replace(char::is_whitespace, "")); /*
 )
 # */ }
 ```
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -330,7 +344,7 @@ parse_where_shim! {
         'a: 'b,
         T: 'a + Copy,
         for<'c> U: Foo<'c>,
-    ; X
+    { struct fields... }
 }
 
 // Expands to:
@@ -342,7 +356,7 @@ stringify!(
         preds: [ 'a: 'b, T: 'a + Copy, for<'c,> U: Foo<'c>, ],
         ..
     },
-    ; X
+    { struct fields... }
 # ".replace(char::is_whitespace, "")); /*
 )
 # */ }
@@ -351,6 +365,8 @@ stringify!(
 The input does not *have* to start with a `where` clause:
 
 ```rust
+# #![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+# #![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 # #[macro_use] extern crate parse_generics_shim;
 # fn main() {
 # assert_eq!( (
@@ -374,7 +390,10 @@ stringify!(
 # */ }
 ```
 */
+#![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+#![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 
+#[cfg(not(feature="use-parse-generics-poc"))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! parse_generics_shim_util {

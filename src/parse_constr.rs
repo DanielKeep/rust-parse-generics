@@ -1,3 +1,4 @@
+#[cfg(not(feature="use-parse-generics-poc"))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! parse_constr {

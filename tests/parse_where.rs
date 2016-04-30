@@ -1,3 +1,5 @@
+#![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+#![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 #[macro_use] extern crate parse_generics_shim;
 
 macro_rules! as_item { ($i:item) => { $i } }
@@ -74,17 +76,17 @@ fn test_where() {
     );
 
     aeqiws!(
-        pwts!({..}, where 'a: 'b, T: 'a + U,; X),
+        pwts!({..}, where 'a: 'b, T: 'a + U, {} X),
         r#"
             { preds : [ 'a : 'b , T : 'a + U , ] , .. } ,
-            ; X
+            { } X
         "#
     );
 
     aeqiws!(
         pwts!({..}, where for<> T: 'a; X),
         r#"
-            { preds : [ for < > T : 'a , ] , .. } ,
+            { preds : [ T : 'a , ] , .. } ,
             ; X
         "#
     );

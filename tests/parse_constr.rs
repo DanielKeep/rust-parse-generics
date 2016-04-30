@@ -1,3 +1,4 @@
+#![cfg(not(feature="use-parse-generics-poc"))]
 #[macro_use] extern crate parse_generics_shim;
 
 macro_rules! aeqiws {

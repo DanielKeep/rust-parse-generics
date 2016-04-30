@@ -1,3 +1,5 @@
+#![cfg_attr(feature="use-parse-generics-poc", feature(plugin))]
+#![cfg_attr(feature="use-parse-generics-poc", plugin(parse_generics_poc))]
 #[macro_use] extern crate parse_generics_shim;
 
 macro_rules! as_item { ($i:item) => { $i } }

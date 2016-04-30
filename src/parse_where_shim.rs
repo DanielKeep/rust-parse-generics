@@ -1,3 +1,13 @@
+#[cfg(feature="use-parse-generics-poc")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! parse_where_shim {
+    ($($body:tt)*) => {
+        parse_where! { $($body)* }
+    };
+}
+
+#[cfg(not(feature="use-parse-generics-poc"))]
 #[doc(hidden)]
 #[macro_export]
 macro_rules! parse_where_shim {
@@ -129,6 +139,20 @@ macro_rules! parse_where_shim {
             $prefix,
             { preds: [$($preds)* $($thing)*: $($constr)*,], },
             $($body)*
+        }
+    };
+
+    (
+        @parsed_for
+        $prefix:tt,
+        $fields:tt,
+        { constr: [], },
+        $tname:ident: $($tail:tt)*
+    ) => {
+        parse_constr! {
+            (true, true),
+            then parse_where_shim! { @app_con $prefix, $fields, {$tname}: },
+            $($tail)*
         }
     };
 
