@@ -1,0 +1,11 @@
+[package]
+name = "parse-generics-poc"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[lib]
+name = "parse_generics_poc"
+plugin = true
+
+[dev-dependencies]
+custom_derive = "0.1.4"
