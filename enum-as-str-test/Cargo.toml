@@ -1,0 +1,18 @@
+[package]
+name = "enum-as-str-test"
+version = "0.1.0"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[features]
+use-parse-generics-poc = [
+    "enum-to-str/use-parse-generics-poc",
+    "parse-generics-poc",
+    "parse-macros/use-parse-generics-poc",
+]
+
+[dependencies]
+custom_derive = "0.1.5"
+enum-as-str = { version = "0.1.0", path = "../enum-as-str" }
+parse-generics-poc = { version = "0.1.0", optional = true, path = "../parse-generics-poc" }
+parse-generics-shim = { version = "0.1.0", path = "../parse-generics-shim" }
+parse-macros = { version = "0.1.0", path = "../parse-macros" }

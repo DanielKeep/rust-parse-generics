@@ -7,7 +7,7 @@ This repository contains several pieces related to the proposed [RFC #1583]:
 - `parse-generics-shim` - a "polyfill" shim containing an implementation of a subset of the RFC in stable `macro_rules!`.
 - `parse-macros` - a crate containing higher-level parsing macros built on top of `parse-generics-shim`.
 
-Examples of using these can be found by looking at each crate's `tests` directory.  In particular, the following for the `parse-macros` crate:
+A very basic example of using `parse-macros` in a crate, and then using *that* crate, is provided by the [`enum-as-str`](enum-as-str/) and [`enum-as-str-test`](enum-as-str-test/) crates.  Further examples can be found by looking at the `parse-macro` crate's `tests` directory.  Specifically:
 
 - [`derive_clone.rs`](parse-macros/tests/derive_clone.rs) - a stable implementation of the built-in `Clone` derivation compiler plugin.
 - [`derive_partial_ord.rs`](parse-macros/tests/derive_partial_ord.rs) - a stable implementation of the built-in `PartialOrd` derivation compiler plugin.  I was once *assured* this was impossible by a member of the core team.
