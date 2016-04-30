@@ -5,7 +5,7 @@ authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
 [features]
 use-parse-generics-poc = [
-    "enum-to-str/use-parse-generics-poc",
+    "enum-as-str/use-parse-generics-poc",
     "parse-generics-poc",
     "parse-macros/use-parse-generics-poc",
 ]

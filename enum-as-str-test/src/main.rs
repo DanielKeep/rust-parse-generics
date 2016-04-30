@@ -10,7 +10,7 @@ or distributed except according to those terms.
 #![cfg_attr(feature="parse-generics-poc", feature(plugin))]
 #![cfg_attr(feature="parse-generics-poc", plugin(parse_generics_poc))]
 #[macro_use] extern crate custom_derive;
-#[macro_use] extern crate enum_to_str;
+#[macro_use] extern crate enum_as_str;
 #[macro_use] extern crate parse_generics_shim;
 #[macro_use] extern crate parse_macros;
 
