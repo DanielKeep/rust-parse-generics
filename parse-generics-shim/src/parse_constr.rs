@@ -89,6 +89,7 @@ macro_rules! parse_constr {
         }
     };
 
+    (@parse $prefix:tt, (true, $atr:tt), {$($constr:tt)*}, 'static $($body:tt)*) => { parse_constr! { @parse $prefix, (true, $atr), {$($constr)* 'static}, $($body)* } };
     (@parse $prefix:tt, (true, $atr:tt), {$($constr:tt)*}, 'a $($body:tt)*) => { parse_constr! { @parse $prefix, (true, $atr), {$($constr)* 'a}, $($body)* } };
     (@parse $prefix:tt, (true, $atr:tt), {$($constr:tt)*}, 'b $($body:tt)*) => { parse_constr! { @parse $prefix, (true, $atr), {$($constr)* 'b}, $($body)* } };
     (@parse $prefix:tt, (true, $atr:tt), {$($constr:tt)*}, 'c $($body:tt)*) => { parse_constr! { @parse $prefix, (true, $atr), {$($constr)* 'c}, $($body)* } };

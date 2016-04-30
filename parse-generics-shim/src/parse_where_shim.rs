@@ -68,6 +68,7 @@ macro_rules! parse_where_shim {
         }
     };
 
+    (@parse $prefix:tt, $fields:tt, 'static: $($tail:tt)*) => { parse_constr! { (true, false), then parse_where_shim! { @app_con $prefix, $fields, {'static}:  }, $($tail)* } };
     (@parse $prefix:tt, $fields:tt, 'a: $($tail:tt)*) => { parse_constr! { (true, false), then parse_where_shim! { @app_con $prefix, $fields, {'a}:  }, $($tail)* } };
     (@parse $prefix:tt, $fields:tt, 'b: $($tail:tt)*) => { parse_constr! { (true, false), then parse_where_shim! { @app_con $prefix, $fields, {'b}:  }, $($tail)* } };
     (@parse $prefix:tt, $fields:tt, 'c: $($tail:tt)*) => { parse_constr! { (true, false), then parse_where_shim! { @app_con $prefix, $fields, {'c}:  }, $($tail)* } };

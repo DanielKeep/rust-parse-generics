@@ -422,6 +422,7 @@ fn test_passthru() {
     parse_generics_shim! { { .. }, then emit!{l2}, <'a, 'b: 'a, 'c: 'a + 'b> X }
     parse_generics_shim! { { .. }, then emit!{m}, <'a, T: 'a + Copy> X }
     parse_generics_shim! { { .. }, then emit!{m2}, <'a, T: 'a + Copy + Clone> X }
+    parse_generics_shim! { { .. }, then emit!{n}, <T: 'static> X }
 
     let _ = "the rustc parser is stoopid";
 }
