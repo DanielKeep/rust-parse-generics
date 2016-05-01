@@ -10,5 +10,5 @@ use-parse-generics-poc = [
 ]
 
 [dependencies]
-parse-generics-poc = { version = "0.1.0", optional = true, path = "../parse-generics-poc" }
-parse-macros = { version = "0.1.0", path = "../parse-macros" }
+parse-generics-poc = { version = "0.1.0", optional = true }
+parse-macros = "0.1.0"
