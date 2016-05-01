@@ -17,6 +17,8 @@ import sys
 import tempfile
 import time
 
+from itertools import chain
+
 DOC_ARGS = '--no-deps'
 DOC_FEATURES = ""
 DOC_TARGET_BRANCH = 'gh-pages'
@@ -27,6 +29,25 @@ TEMP_OUTPUT_PREFIX = 'gh-pages-generated-'
 
 USE_ANSI = True if sys.platform != 'win32' else os.environ.get('FORCE_ANSI', '') != ''
 TRACE_UPDATE_DOCS = os.environ.get('TRACE_UPDATE_DOCS', '') != ''
+
+def which(programname, all=False):
+    path_exts = os.environ.get('PATHEXT', '').split(os.path.pathsep)
+    path_exts = [e for e in path_exts if e.lstrip() != '']
+
+    def matches():
+        for path in os.environ['PATH'].split(os.path.pathsep):
+            base_path = os.path.join(path, programname)
+            for ext in chain(('',), path_exts):
+                ext_path = base_path+ext
+                if os.path.exists(os.path.normcase(ext_path)):
+                    yield ext_path
+
+    if all:
+        return matches()
+    else:
+        return next(matches(), None)
+
+RUSTUP = "rustup" if which("rustup") is not None else "multirust"
 
 def sh(cmd):
     msg_trace('sh(%r)' % cmd)
@@ -143,7 +164,7 @@ def gen_doc_bare(tmp1, tmp2):
     msg("Generating documentation...")
     args = '%s --features="%s"' % (DOC_ARGS, DOC_FEATURES)
     if DOC_TOOLCHAIN is not None:
-        toolchain = "rustup run %s " % DOC_TOOLCHAIN
+        toolchain = "%s run %s " % (RUSTUP, DOC_TOOLCHAIN)
     else:
         toolchain = ""
     sh('%scargo doc %s' % (toolchain, args))
@@ -167,7 +188,7 @@ def gen_doc_pkg(tmp1, tmp2, doc_pkg):
             % os.path.join(doc_pkg, 'Cargo.toml'))
         manifest = json.loads(manifest_str)
         if DOC_TOOLCHAIN is not None:
-            toolchain = "rustup run %s " % DOC_TOOLCHAIN
+            toolchain = "%s run %s " % (RUSTUP, DOC_TOOLCHAIN)
         else:
             toolchain = ""
         packages = " ".join("--package %s" % d['name'] for d in manifest['dependencies'])
