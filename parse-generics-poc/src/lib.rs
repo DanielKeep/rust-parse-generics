@@ -29,6 +29,7 @@ As this is a proof-of-concept compiler plugin, you should avoid using this crate
 
 **Links**
 
+* [Latest Release](https://crates.io/crates/parse-generics-poc)
 * [Latest Docs](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_poc/index.html)
 * [Repository](https://github.com/DanielKeep/rust-parse-generics)
 

@@ -29,6 +29,7 @@ Specifically, these macros are concerned with taking Rust source constructs and 
 
 **Links**
 
+* [Latest Release](https://crates.io/crates/parse-generics-macros)
 * [Latest Docs](https://danielkeep.github.io/rust-parse-generics/doc/parse_macros/index.html)
 * [Repository](https://github.com/DanielKeep/rust-parse-generics)
 

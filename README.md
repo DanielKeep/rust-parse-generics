@@ -16,6 +16,7 @@ A very basic example of using `parse-macros` in a crate, and then using *that* c
 
 **Links**
 
+* Latest Releases ([`parse-generics-poc`](https://crates.io/crates/parse-generics-poc), [`parse-generics-shim`](https://crates.io/crates/parse-generics-shim), [`parse-macros`](https://crates.io/crates/parse-macros))
 * Latest Docs ([`parse-generics-poc`](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_poc/index.html), [`parse-generics-shim`](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_shim/index.html), [`parse-macros`](https://danielkeep.github.io/rust-parse-generics/doc/parse_macros/index.html))
 * [Repository](https://github.com/DanielKeep/rust-parse-generics)
 

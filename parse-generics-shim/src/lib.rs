@@ -37,6 +37,7 @@ Because these macros are implemented using `macro_rules!`, they have the followi
 
 **Links**
 
+* [Latest Release](https://crates.io/crates/parse-generics-shim)
 * [Latest Docs](https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_shim/index.html)
 * [Repository](https://github.com/DanielKeep/rust-parse-generics)
 
