@@ -3,6 +3,12 @@ name = "parse-generics-poc"
 version = "0.1.0"
 authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
+description = "A proof-of-concept implementation of the proposed RFC #1583; provides macros for parsing generics and where clauses.  Note: requires a compatible nightly compiler.  For a stable alternative, see the parse-generics-shim crate."
+repository = "https://github.com/DanielKeep/rust-parse-generics"
+documentation = "https://danielkeep.github.io/rust-parse-generics/doc/parse_generics_poc/index.html"
+keywords = ["macro", "parse", "generics", "where", "plugin"]
+license = "MIT/Apache-2.0"
+
 [lib]
 name = "parse_generics_poc"
 plugin = true

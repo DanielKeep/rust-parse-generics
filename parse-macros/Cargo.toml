@@ -3,6 +3,12 @@ name = "parse-macros"
 version = "0.1.0"
 authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
+description = "Provides macros for parsing Rust constructs such as enums and structs."
+repository = "https://github.com/DanielKeep/rust-parse-generics"
+documentation = "https://danielkeep.github.io/rust-parse-generics/doc/parse_macros/index.html"
+keywords = ["macro", "parse", "enum", "struct"]
+license = "MIT/Apache-2.0"
+
 build = "build.rs"
 
 [features]
