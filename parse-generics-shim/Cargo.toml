@@ -1,6 +1,6 @@
 [package]
 name = "parse-generics-shim"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Daniel Keep <daniel.keep@gmail.com>"]
 
 description = "A stable shim for the proposed RFC #1583; provides macros for parsing generics and where clauses."
