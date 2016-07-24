@@ -49,4 +49,24 @@ macro_rules! parse_item {
             $(#[$($attrs)*])* struct $($tail)*
         }
     };
+
+    (
+        then $cb:ident!$cb_arg:tt,
+        $(#[$($attrs:tt)*])* pub type $($tail:tt)*
+    ) => {
+        parse_type_item! {
+            then $cb!$cb_arg,
+            $(#[$($attrs)*])* pub type $($tail)*
+        }
+    };
+
+    (
+        then $cb:ident!$cb_arg:tt,
+        $(#[$($attrs:tt)*])* type $($tail:tt)*
+    ) => {
+        parse_type_item! {
+            then $cb!$cb_arg,
+            $(#[$($attrs)*])* type $($tail)*
+        }
+    };
 }

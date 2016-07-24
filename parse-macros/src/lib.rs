@@ -528,3 +528,4 @@ rustup override add nightly-2016-04-06
 #[macro_use] mod parse_item;
 #[macro_use] mod parse_macros_util;
 #[macro_use] mod parse_struct;
+#[macro_use] mod parse_type_item;
