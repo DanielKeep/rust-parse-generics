@@ -186,6 +186,19 @@ macro_rules! parse_constr {
     (
         @parse_delim
         { $prefix:tt, $allow:tt },
+        [ # ], {$($constr:tt)*},
+        >> $($body:tt)*
+    ) => {
+        parse_constr! {
+            @parse
+            $prefix, $allow, {$($constr)* >},
+            > $($body)*
+        }
+    };
+
+    (
+        @parse_delim
+        { $prefix:tt, $allow:tt },
         [ # # ], {$($constr:tt)*},
         >> $($body:tt)*
     ) => {

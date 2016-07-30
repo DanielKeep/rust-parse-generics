@@ -60,4 +60,5 @@ fn test_simple() {
         else { "{ 'a + :: std:: clone:: Clone } , ; X" } );
     aeqiws!(pgts!('a + From<u8>; X), "{ 'a + From < u8 > } , ; X");
     aeqiws!(pgts!('a + From<Bar<u8>>; X), "{ 'a + From < Bar < u8 >> } , ; X");
+    aeqiws!(pgts!('a + From<Bar>> X), "{ 'a + From < Bar > } , > X");
 }

@@ -388,7 +388,7 @@ fn test_constr_lt_params() {
     );
 
     aeqiws!(
-        pgts!({ .. }, <T: ?Sized + Clone + Copy + for<'a> From<&'a str> > X),
+        pgts!({ .. }, <T: ?Sized + Clone + Copy + for<'a> From<&'a str>> X),
         if cfg!(feature="parse-generics-poc") {
             r#"
                 {
@@ -452,6 +452,7 @@ fn test_passthru() {
     parse_generics_shim! { { .. }, then emit!{m}, <'a, T: 'a + Copy> X }
     parse_generics_shim! { { .. }, then emit!{m2}, <'a, T: 'a + Copy + Clone> X }
     parse_generics_shim! { { .. }, then emit!{n}, <T: 'static> X }
+    parse_generics_shim! { { .. }, then emit!{o}, <T: From<u8>> X }
 
     let _ = "the rustc parser is stoopid";
 }
