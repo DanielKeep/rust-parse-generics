@@ -16,3 +16,6 @@ use-parse-generics-poc = ["parse-generics-poc"]
 version = "0.1.0"
 optional = true
 path = "../parse-generics-poc"
+
+[dev-dependencies]
+rustc_version = "0.1.7"

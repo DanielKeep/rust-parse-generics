@@ -9,6 +9,7 @@ or distributed except according to those terms.
 */
 #![cfg(not(feature="use-parse-generics-poc"))]
 #[macro_use] extern crate parse_generics_shim;
+extern crate rustc_version;
 
 macro_rules! aeqiws {
     ($lhs:expr, $rhs:expr) => {
@@ -36,6 +37,12 @@ macro_rules! pgts {
     };
 }
 
+macro_rules! rv {
+    ($($tts:tt)*) => {
+        ::rustc_version::version_matches(concat!($(stringify!($tts)),*))
+    };
+}
+
 #[test]
 fn test_simple() {
     aeqiws!(pgts!('a, X), "{ 'a } , , X");
@@ -48,7 +55,9 @@ fn test_simple() {
     aeqiws!(pgts!('a + T; X), "{ 'a + T } , ; X");
     aeqiws!(pgts!('a + 'b; X), "{ 'a + 'b } , ; X");
     aeqiws!(pgts!('a + 'b + T; X), "{ 'a + 'b + T } , ; X");
-    aeqiws!(pgts!('a + ::std::clone::Clone; X), "{ 'a + :: std:: clone:: Clone } , ; X");
+    aeqiws!(pgts!('a + ::std::clone::Clone; X),
+        if rv!(1.10) { "{ 'a + :: std :: clone :: Clone } , ; X" }
+        else { "{ 'a + :: std:: clone:: Clone } , ; X" } );
     aeqiws!(pgts!('a + From<u8>; X), "{ 'a + From < u8 > } , ; X");
     aeqiws!(pgts!('a + From<Bar<u8>>; X), "{ 'a + From < Bar < u8 >> } , ; X");
 }
